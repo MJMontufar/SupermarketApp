@@ -3,7 +3,7 @@
 Proyecto de Programación II: sistema POS de supermercado con Java 21, Swing,
 JDBC puro y Oracle Database XE 21c. Sin Maven, Gradle ni frameworks.
 
-## Estado de la primera etapa
+## Estado del proyecto
 
 Implementado y comprobable sin Oracle:
 
@@ -13,10 +13,17 @@ Implementado y comprobable sin Oracle:
 - Hash PBKDF2-HMAC-SHA256 con sal aleatoria y verificación de contraseñas.
 - Ejecutor de pruebas propio, sin JUnit.
 
-Todavía faltan las ventanas Swing, las entidades de turno/venta y sus servicios,
-la conexión JDBC, los scripts SQL y la administración persistida. No hay login
-ni usuarios de aplicación creados todavía. Oracle no es necesario para estas
-primeras pruebas; sí será obligatorio para completar el proyecto.
+La segunda etapa agrega el esquema Oracle de 15 tablas, los índices de turno
+único por caja y cajero, datos iniciales, conexión JDBC y pruebas de integridad.
+La cuenta de entrenamiento `admin / Admin123!` se crea al cargar los datos,
+con contraseña PBKDF2. Todavía no hay pantalla de login.
+
+Faltan las ventanas Swing, las entidades Java de turno/venta y sus servicios,
+los DAO y la administración desde la aplicación. Las pruebas sin Oracle siguen
+funcionando por separado.
+
+Para preparar la base, sigue [la guía de Oracle y JDBC](docs/base-de-datos.md).
+El [diagrama entidad-relación](docs/modelo-er.md) corresponde al esquema actual.
 
 ## Abrir en VS Code
 
@@ -80,21 +87,37 @@ src/com/supermercado/pos/
 test/com/supermercado/pos/pruebas/Pruebas.java
 scripts/       Compilación y pruebas para Windows
 docs/          Explicación de la primera etapa
+sql/           Creación de cuentas, esquema, datos y verificación
+lib/           Driver JDBC descargado localmente, excluido de Git
+config.properties  URL de Oracle, usuario POS y mínimo operativo; sin claves
 ```
 
 ## Validación de esta etapa
 
-Las 37 pruebas de esta etapa pasaron con JDK 21 en Linux, sin advertencias del
+Las 37 pruebas sin base de datos pasaron con JDK 21 en Linux, sin advertencias del
 compilador. Los scripts se ejercitaron con PowerShell 7 en Linux, incluyendo
 rutas con espacios y un fallo de compilación simulado. La ejecución en Windows
-PowerShell de tu computadora queda pendiente de comprobar.
+de la primera etapa también fue confirmada durante el desarrollo.
+
+La segunda etapa tiene una suite separada para Oracle XE 21c: revisa la guía de
+base de datos para ejecutarla exclusivamente en `POS_TEST`. La suite conserva
+las tablas y revierte sus registros de prueba con `rollback`. Las secuencias de
+identidad pueden avanzar incluso al deshacer una transacción.
+
+Las 9 pruebas Oracle pasaron con Oracle XE 21.3, Java 21 y `ojdbc11` 21.11.
+Se ejecutaron los scripts SQL en POS y POS_TEST, la conexión JDBC y la repetición
+de datos iniciales conservando precio y stock existentes. El descargador se
+probó con PowerShell 7 en Linux, incluyendo descarga, checksum, reutilización
+y conservación de un driver distinto. Esta etapa aún debe ejecutarse en el
+Windows del estudiante siguiendo la guía.
 
 ## Límites de estas pruebas
 
 Se validan cálculos, cambios del carrito, permisos en memoria y criptografía.
 Estas pruebas no sustituyen los nueve casos obligatorios de la fase 10 del PDF:
-los turnos, pagos, retiros, reversiones, cierre y rollback se probarán al conectar
-los servicios con Oracle, en un esquema de pruebas separado.
+los servicios de turnos, pagos, retiros, reversiones y cierre siguen pendientes.
+Las pruebas Oracle actuales verifican restricciones y rollback JDBC directamente;
+no acreditan el comportamiento de servicios que todavía no están implementados.
 
 El carrito comprueba el stock que tiene en memoria, pero no lo descuenta. Al
 cobrar, el servicio deberá comprobarlo de nuevo en Oracle y descontarlo dentro
