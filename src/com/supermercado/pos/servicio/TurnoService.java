@@ -9,6 +9,7 @@ import com.supermercado.pos.dominio.Turno;
 import com.supermercado.pos.dominio.Usuario;
 import com.supermercado.pos.excepcion.ReglaNegocioException;
 import com.supermercado.pos.util.Conexion;
+import com.supermercado.pos.util.Dinero;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -31,17 +32,14 @@ public final class TurnoService {
     }
     public Turno abrir(Usuario actor, long cajaId, BigDecimal fondo) {
         Reglas.requerir(actor, "TURNO_ABRIR");
+        if (fondo != null && fondo.signum() == 0) {
+            throw new ReglaNegocioException("El fondo cero requiere autorizacion de un supervisor");
+        }
         BigDecimal inicial = Reglas.monto(fondo, "Fondo inicial", true);
         try (Connection con = Conexion.obtener()) {
             con.setAutoCommit(false);
             try {
-                if (!cajas.bloquearActiva(con, cajaId)) { throw new ReglaNegocioException("La caja no existe o esta inactiva"); }
-                if (turnos.abiertoPorCajero(con, actor.getId()).isPresent()) {
-                    throw new ReglaNegocioException("Ya tienes un turno abierto; utiliza Continuar turno");
-                }
-                long id = turnos.insertar(con, cajaId, actor.getId(), inicial);
-                turnos.fondoInicial(con, id, inicial);
-                Turno turno = turnos.buscar(con, id).orElseThrow();
+                Turno turno = guardarApertura(con, actor, cajaId, inicial, null);
                 con.commit(); return turno;
             } catch (SQLException | RuntimeException e) {
                 con.rollback();
@@ -51,6 +49,41 @@ public final class TurnoService {
                 throw e;
             }
         } catch (SQLException e) { throw new IllegalStateException("No se pudo abrir el turno", e); }
+    }
+    private Turno guardarApertura(Connection con, Usuario actor, long cajaId, BigDecimal fondo, Long autor) throws SQLException {
+        Reglas.requerir(actor, "TURNO_ABRIR");
+        if (!cajas.bloquearActiva(con, cajaId)) { throw new ReglaNegocioException("La caja no existe o esta inactiva"); }
+        if (turnos.abiertoPorCajero(con, actor.getId()).isPresent()) {
+            throw new ReglaNegocioException("Ya tienes un turno abierto; utiliza Continuar turno");
+        }
+        try {
+            long id = turnos.insertar(con, cajaId, actor.getId(), fondo, autor);
+            turnos.fondoInicial(con, id, fondo, autor);
+            return turnos.buscar(con, id).orElseThrow();
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 1) { throw new ReglaNegocioException("La caja o el cajero ya tienen un turno abierto"); }
+            throw e;
+        }
+    }
+    public AperturaCero solicitarAperturaCero(Usuario actor, long cajaId) {
+        Reglas.requerir(actor, "TURNO_ABRIR");
+        return new AperturaCero(actor, cajaId);
+    }
+    /** No acepta un Usuario supuesto supervisor: siempre solicita sus credenciales. */
+    public final class AperturaCero {
+        private final Usuario actor;
+        private final long caja;
+        private final AutorizacionService.Solicitud solicitud;
+        private AperturaCero(Usuario actor, long caja) {
+            this.actor = actor; this.caja = caja;
+            solicitud = new AutorizacionService().solicitar(actor, "APERTURA_CERO caja=" + caja);
+        }
+        public int intentosRestantes() { return solicitud.restantes(); }
+        public boolean terminada() { return solicitud.terminada(); }
+        public Turno confirmar(String username, char[] clave) {
+            return solicitud.ejecutar(username, clave,
+                    (con, supervisor) -> guardarApertura(con, actor, caja, Dinero.CERO, supervisor.getId()));
+        }
     }
     public ResumenTurno resumen(long id, Usuario actor) {
         Reglas.requerir(actor, "TURNO_CERRAR");

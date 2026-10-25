@@ -164,3 +164,10 @@ cierra conexión, sentencia y resultado al terminar.
 Las siguientes clases DAO usarán este mismo patrón y recibirán una `Connection`.
 El servicio controlará `commit` y `rollback`, para que toda una operación de
 negocio se confirme o se deshaga junta.
+
+## Actualización para la excepción de fondo cero
+
+Si las tablas ya existen, consulta [apertura cero autorizada](apertura-cero.md).
+Desde la raíz ejecuta `scripts/actualizar-bd.ps1` para POS; con `-Pruebas`
+actualiza POS_TEST. Cada llamada pide su propia contraseña de Oracle. No borra
+datos ni cambia contraseñas. No repitas 00/01 para hacer esta actualización.

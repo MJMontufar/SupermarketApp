@@ -77,7 +77,16 @@ public final class AperturaTurnoFrame extends JDialog {
         try {
             Caja caja = (Caja) cajas.getSelectedItem();
             if (caja == null) { throw new ReglaNegocioException("Selecciona una caja disponible"); }
-            BigDecimal monto = Campos.monto(fondo);
+            BigDecimal monto = Campos.montoExacto(fondo);
+            if (monto.signum() == 0) {
+                AutorizacionDialog autorizacion = new AutorizacionDialog(this, actor, caja,
+                        servicio.solicitarAperturaCero(actor, caja.id()));
+                autorizacion.setVisible(true);
+                if (autorizacion.getTurnoCreado() != null) {
+                    creado = autorizacion.getTurnoCreado(); dispose();
+                }
+                return;
+            }
             ocupado(true);
             Tareas.ejecutar(this, () -> servicio.abrir(actor, caja.id(), monto), turno -> {
                 creado = turno; dispose();

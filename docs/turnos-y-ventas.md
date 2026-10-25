@@ -2,6 +2,8 @@
 
 Esta entrega implementa las fases 4 y 5 del PDF y el cierre básico de la fase 8.
 Reutiliza las 15 tablas existentes: **no ejecutes otra vez los SQL 00 y 01**.
+La entrega posterior incorpora [apertura Q0 autorizada](apertura-cero.md):
+aplica `scripts/actualizar-bd.ps1` una vez antes de iniciar esa versión.
 Conserva a Ana, Luis, Marta y cualquier usuario creado en tu Oracle local.
 Los retiros a bóveda y las reversiones autorizadas corresponden a la siguiente
 entrega; todavía no tienen servicio ni pantalla.

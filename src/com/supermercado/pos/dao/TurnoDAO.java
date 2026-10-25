@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public final class TurnoDAO {
     private static final String CONSULTA = """
-            SELECT t.id, t.cajero_id, t.apertura, t.fondo_inicial, t.estado,
+            SELECT t.id, t.cajero_id, t.apertura, t.fondo_inicial, t.estado, t.apertura_autorizada_por,
                    c.id caja_id, c.numero, c.nombre FROM turno t JOIN caja c ON c.id = t.caja_id
             """;
     public Optional<Turno> abiertoPorCajero(Connection con, long id) throws SQLException {
@@ -38,17 +38,21 @@ public final class TurnoDAO {
             }
         }
     }
-    public long insertar(Connection con, long caja, long cajero, BigDecimal fondo) throws SQLException {
+    public long insertar(Connection con, long caja, long cajero, BigDecimal fondo, Long autorizadoPor) throws SQLException {
         try (PreparedStatement ps = con.prepareStatement(
-                "INSERT INTO turno (caja_id, cajero_id, fondo_inicial) VALUES (?, ?, ?)", new String[] {"ID"})) {
-            ps.setLong(1, caja); ps.setLong(2, cajero); ps.setBigDecimal(3, fondo); ps.executeUpdate();
+                "INSERT INTO turno (caja_id, cajero_id, fondo_inicial, apertura_autorizada_por) VALUES (?, ?, ?, ?)", new String[] {"ID"})) {
+            ps.setLong(1, caja); ps.setLong(2, cajero); ps.setBigDecimal(3, fondo);
+            if (autorizadoPor == null) { ps.setNull(4, java.sql.Types.NUMERIC); } else { ps.setLong(4, autorizadoPor); }
+            ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) { rs.next(); return rs.getLong(1); }
         }
     }
-    public void fondoInicial(Connection con, long turno, BigDecimal fondo) throws SQLException {
+    public void fondoInicial(Connection con, long turno, BigDecimal fondo, Long autorizadoPor) throws SQLException {
         try (PreparedStatement ps = con.prepareStatement(
-                "INSERT INTO movimiento_caja (turno_id, tipo, monto) VALUES (?, 'FONDO_INICIAL', ?)")) {
-            ps.setLong(1, turno); ps.setBigDecimal(2, fondo); ps.executeUpdate();
+                "INSERT INTO movimiento_caja (turno_id, tipo, monto, autorizado_por) VALUES (?, 'FONDO_INICIAL', ?, ?)")) {
+            ps.setLong(1, turno); ps.setBigDecimal(2, fondo);
+            if (autorizadoPor == null) { ps.setNull(3, java.sql.Types.NUMERIC); } else { ps.setLong(3, autorizadoPor); }
+            ps.executeUpdate();
         }
     }
     public void cerrar(Connection con, long turno, BigDecimal contado, BigDecimal esperado, LocalDateTime fecha) throws SQLException {
@@ -98,6 +102,7 @@ public final class TurnoDAO {
     private Turno mapear(ResultSet rs) throws SQLException {
         return new Turno(rs.getLong("id"), new Caja(rs.getLong("caja_id"), rs.getInt("numero"), rs.getString("nombre")),
                 rs.getLong("cajero_id"), rs.getTimestamp("apertura").toLocalDateTime(),
-                rs.getBigDecimal("fondo_inicial"), rs.getString("estado"));
+                rs.getBigDecimal("fondo_inicial"), rs.getString("estado"),
+                rs.getObject("apertura_autorizada_por") == null ? null : rs.getLong("apertura_autorizada_por"));
     }
 }
