@@ -16,14 +16,35 @@ Implementado y comprobable sin Oracle:
 La segunda etapa agrega el esquema Oracle de 15 tablas, los índices de turno
 único por caja y cajero, datos iniciales, conexión JDBC y pruebas de integridad.
 La cuenta de entrenamiento `admin / Admin123!` se crea al cargar los datos,
-con contraseña PBKDF2. Todavía no hay pantalla de login.
+con contraseña PBKDF2.
 
-Faltan las ventanas Swing, las entidades Java de turno/venta y sus servicios,
-los DAO y la administración desde la aplicación. Las pruebas sin Oracle siguen
-funcionando por separado.
+La tercera etapa agrega login Swing, menú según permisos, DAO de usuarios y
+roles, y administración básica: alta con rol inicial, búsqueda, edición de
+nombre/contraseña y desactivación. El servicio aplica permisos y jerarquía,
+además de los controles de la interfaz.
+
+Siguen pendientes el ciclo de caja (turnos, ventas, retiros, reversiones y cierre),
+los catálogos editables, la matriz de roles/permisos y la asignación múltiple de
+roles y permisos extra. Las pruebas sin Oracle funcionan por separado.
 
 Para preparar la base, sigue [la guía de Oracle y JDBC](docs/base-de-datos.md).
 El [diagrama entidad-relación](docs/modelo-er.md) corresponde al esquema actual.
+
+## Abrir la aplicación de escritorio
+
+Con POS ya preparado y `lib/ojdbc11.jar` presente, abre una terminal integrada
+desde la carpeta `scripts` y ejecuta:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\iniciar.ps1
+```
+
+Primero ingresa la clave de Oracle de **pos** en la consola. Después se abre la
+ventana de login: usa **admin / Admin123!** para la cuenta de entrenamiento.
+Son credenciales distintas. No se necesitan cambios SQL para esta tercera etapa.
+
+Consulta [la guía de login y usuarios](docs/login-y-usuarios.md) para actualizar
+tu copia y crear a Ana, Luis y Marta. Conserva tu driver local al actualizar.
 
 ## Abrir en VS Code
 
@@ -82,8 +103,11 @@ Ejecuta el último comando solo si la compilación termina correctamente.
 ```text
 src/com/supermercado/pos/
   dominio/     Producto, Carrito, LineaCarrito, Usuario, Rol, Permiso
-  excepcion/   ReglaNegocioException
-  util/        Dinero, Seguridad
+  dao/         UsuarioDAO, RolDAO
+  servicio/    AuthService, UsuarioService
+  ui/          Login, menú, lista y formulario de usuarios
+  excepcion/   ReglaNegocioException, AutorizacionException
+  util/        Dinero, Seguridad, Conexion, Configuracion, Sesion
 test/com/supermercado/pos/pruebas/Pruebas.java
 scripts/       Compilación y pruebas para Windows
 docs/          Explicación de la primera etapa
@@ -108,8 +132,15 @@ Las 9 pruebas Oracle pasaron con Oracle XE 21.3, Java 21 y `ojdbc11` 21.11.
 Se ejecutaron los scripts SQL en POS y POS_TEST, la conexión JDBC y la repetición
 de datos iniciales conservando precio y stock existentes. El descargador se
 probó con PowerShell 7 en Linux, incluyendo descarga, checksum, reutilización
-y conservación de un driver distinto. Esta etapa aún debe ejecutarse en el
-Windows del estudiante siguiendo la guía.
+y conservación de un driver distinto. La conexión JDBC y lectura de cinco
+productos también se confirmaron en Windows durante el desarrollo.
+
+La tercera etapa pasó 19 pruebas funcionales de autenticación y administración
+en POS_TEST. Se comprobó el ingreso oculto de la clave técnica por consola,
+sin variable de entorno. Cuatro pruebas adicionales abrieron ventanas Swing
+reales en Linux con Xvfb, autenticaron, crearon un cajero desde el formulario y
+verificaron los permisos del menú. Hay capturas en
+[evidencias de interfaz](docs/evidencias/etapa3/README.md).
 
 ## Límites de estas pruebas
 
@@ -123,9 +154,9 @@ El carrito comprueba el stock que tiene en memoria, pero no lo descuenta. Al
 cobrar, el servicio deberá comprobarlo de nuevo en Oracle y descontarlo dentro
 de la misma transacción que guarda la venta y sus pagos.
 
-Las entidades de seguridad representan roles y permisos; no autentican usuarios
-ni autorizan por sí solas operaciones de administración. Los futuros servicios
-deberán verificar usuario activo, permisos y jerarquía del actor.
+Las entidades representan datos; `AuthService` autentica y `UsuarioService`
+verifica usuario activo, permisos y jerarquía antes de administrar usuarios.
+La autorización puntual de reversiones y su auditoría siguen pendientes.
 
 Los precios del carrito ya incluyen impuesto, según el PDF. El desglose del
 impuesto se añadirá con la pantalla de cobro; no se suma impuesto al total actual.

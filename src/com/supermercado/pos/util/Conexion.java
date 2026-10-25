@@ -7,15 +7,34 @@ import java.util.Arrays;
 import java.util.Properties;
 
 public final class Conexion {
+    private static char[] claveTemporal;
     private Conexion() { }
+
+    /** Solo la clave tecnica de Oracle, durante la ejecucion de la aplicacion. */
+    public static synchronized void configurarClaveTemporal(char[] clave) {
+        if (clave == null || clave.length == 0) {
+            throw new IllegalArgumentException("La clave de Oracle es obligatoria");
+        }
+        limpiarClaveTemporal();
+        claveTemporal = clave.clone();
+    }
+
+    public static synchronized void limpiarClaveTemporal() {
+        if (claveTemporal != null) { Arrays.fill(claveTemporal, '\0'); }
+        claveTemporal = null;
+    }
+
+    private static synchronized char[] copiarClaveTemporal() {
+        return claveTemporal == null ? null : claveTemporal.clone();
+    }
 
     /** Para procesos automatizados con una variable local ya configurada. */
     public static Connection obtener() throws SQLException {
         String valor = System.getenv("POS_DB_PASSWORD");
-        if (valor == null || valor.isEmpty()) {
+        char[] clave = valor == null || valor.isEmpty() ? copiarClaveTemporal() : valor.toCharArray();
+        if (clave == null) {
             throw new IllegalStateException("Falta POS_DB_PASSWORD o usa obtener(char[] clave)");
         }
-        char[] clave = valor.toCharArray();
         try {
             return obtener(clave);
         } finally {
