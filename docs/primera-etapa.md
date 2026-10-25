@@ -46,17 +46,17 @@ nivel más alto de sus roles; un permiso extra no aumenta el nivel.
 Los permisos se comparan por código y los roles por nombre. Esos campos son
 inmutables para mantener consistente su uso dentro de un `Set`.
 
-Esto todavía no autoriza reversiones ni asignaciones de roles. Esas reglas
-irán en los servicios, que comprobarán también que el usuario esté activo.
+El alta con un rol inicial ya se valida en `UsuarioService`. La autorización de
+reversiones y la asignación posterior de múltiples roles siguen pendientes.
 
 ## Contraseñas
 
 `Seguridad.hash` calcula PBKDF2 y devuelve `iteraciones:sal:hash`. Cada sal es
 aleatoria. `Seguridad.verificar` compara la clave con el registro almacenado.
 
-El futuro login usará `JPasswordField.getPassword()` y limpiará el `char[]` con
-`Arrays.fill` en un bloque `finally`. La contraseña original no se guardará.
-La regla de mínimo ocho caracteres irá en el servicio de usuarios.
+El login usa `JPasswordField.getPassword()` y limpia el `char[]` con
+`Arrays.fill` en un bloque `finally`. La contraseña original no se guarda.
+La regla de mínimo ocho caracteres se valida en `UsuarioService`.
 
 ## Qué observar en las pruebas
 
@@ -72,6 +72,5 @@ Para entender esta etapa, intenta explicar:
 
 ## Siguiente etapa
 
-Crear las entidades restantes y los scripts SQL. Después conectar Oracle con
-JDBC y avanzar al login y apertura de turno. Las ventanas usarán servicios;
-el SQL permanecerá en los DAO.
+Los scripts SQL y la conexión ya se incorporaron en la segunda etapa. Continúa
+con [login y usuarios](login-y-usuarios.md); después avanzaremos a los turnos.
