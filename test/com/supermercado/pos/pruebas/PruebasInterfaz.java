@@ -41,7 +41,7 @@ public final class PruebasInterfaz {
         return null;
     }
 
-    private static Component buscar(Component componente, String nombre) {
+    static Component buscar(Component componente, String nombre) {
         if (nombre.equals(componente.getName())) { return componente; }
         if (componente instanceof Container contenedor) {
             for (Component hijo : contenedor.getComponents()) {
@@ -52,13 +52,13 @@ public final class PruebasInterfaz {
         return null;
     }
 
-    private static <T extends Component> T campo(Window ventana, String nombre, Class<T> tipo) {
+    static <T extends Component> T campo(Window ventana, String nombre, Class<T> tipo) {
         Component componente = buscar(ventana, nombre);
         if (componente == null) { throw new AssertionError("No existe el control " + nombre); }
         return tipo.cast(componente);
     }
 
-    private static void esperar(BooleanSupplier condicion) throws Exception {
+    static void esperar(BooleanSupplier condicion) throws Exception {
         long limite = System.nanoTime() + 20_000_000_000L;
         while (System.nanoTime() < limite) {
             AtomicBoolean cumple = new AtomicBoolean();
@@ -69,14 +69,14 @@ public final class PruebasInterfaz {
         throw new AssertionError("La interfaz no alcanzo el estado esperado en veinte segundos");
     }
 
-    private static <T extends Window> T esperarVentana(Class<T> tipo) throws Exception {
+    static <T extends Window> T esperarVentana(Class<T> tipo) throws Exception {
         esperar(() -> ventana(tipo) != null);
         AtomicReference<T> referencia = new AtomicReference<>();
         SwingUtilities.invokeAndWait(() -> referencia.set(ventana(tipo)));
         return referencia.get();
     }
 
-    private static void ingresar(LoginFrame login, String usuario, String clave) throws Exception {
+    static void ingresar(LoginFrame login, String usuario, String clave) throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             campo(login, "login.usuario", JTextField.class).setText(usuario);
             campo(login, "login.clave", JPasswordField.class).setText(clave);
@@ -84,7 +84,7 @@ public final class PruebasInterfaz {
         });
     }
 
-    private static void capturar(Window ventana, String nombre) throws Exception {
+    static void capturar(Window ventana, String nombre) throws Exception {
         Path carpeta = Path.of(System.getProperty("pos.capturas", "out/capturas"));
         Files.createDirectories(carpeta);
         new Robot().waitForIdle();

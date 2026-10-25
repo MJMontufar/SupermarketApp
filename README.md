@@ -23,9 +23,14 @@ roles, y administración básica: alta con rol inicial, búsqueda, edición de
 nombre/contraseña y desactivación. El servicio aplica permisos y jerarquía,
 además de los controles de la interfaz.
 
-Siguen pendientes el ciclo de caja (turnos, ventas, retiros, reversiones y cierre),
-los catálogos editables, la matriz de roles/permisos y la asignación múltiple de
-roles y permisos extra. Las pruebas sin Oracle funcionan por separado.
+La cuarta entrega agrega apertura y recuperación de turno, carrito Swing,
+cobro en efectivo/tarjeta/mixto, comprobante y cierre con conteo y diferencia.
+La venta y el descuento de stock son una transacción; cobrar y cerrar comparten
+un bloqueo de turno. No se necesitan cambios SQL en bases ya preparadas.
+
+Siguen pendientes retiros a bóveda, reversiones autorizadas, catálogos editables,
+la matriz de roles/permisos y la asignación múltiple de roles y permisos extra.
+Las pruebas sin Oracle funcionan por separado.
 
 Para preparar la base, sigue [la guía de Oracle y JDBC](docs/base-de-datos.md).
 El [diagrama entidad-relación](docs/modelo-er.md) corresponde al esquema actual.
@@ -41,10 +46,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\iniciar.ps1
 
 Primero ingresa la clave de Oracle de **pos** en la consola. Después se abre la
 ventana de login: usa **admin / Admin123!** para la cuenta de entrenamiento.
-Son credenciales distintas. No se necesitan cambios SQL para esta tercera etapa.
+Son credenciales distintas. No se necesitan cambios SQL para las etapas tercera y cuarta.
 
 Consulta [la guía de login y usuarios](docs/login-y-usuarios.md) para actualizar
-tu copia y crear a Ana, Luis y Marta. Conserva tu driver local al actualizar.
+tu copia y crear a Ana, Luis y Marta. Después sigue la
+[práctica de turnos, ventas y cierre](docs/turnos-y-ventas.md), que incluye cómo
+actualizar con Git y los resultados esperados. Conserva tu driver al actualizar.
 
 ## Abrir en VS Code
 
@@ -102,15 +109,15 @@ Ejecuta el último comando solo si la compilación termina correctamente.
 
 ```text
 src/com/supermercado/pos/
-  dominio/     Producto, Carrito, LineaCarrito, Usuario, Rol, Permiso
-  dao/         UsuarioDAO, RolDAO
-  servicio/    AuthService, UsuarioService
-  ui/          Login, menú, lista y formulario de usuarios
+  dominio/     Usuarios, roles, productos, carrito, turnos, pagos, ventas y cierre
+  dao/         Consultas y escrituras JDBC de usuarios, cajas, productos, turnos y ventas
+  servicio/    Autenticación, usuarios, apertura, cobro y cierre transaccional
+  ui/          Login, menú, usuarios, apertura, carrito, pagos, tickets y cierre
   excepcion/   ReglaNegocioException, AutorizacionException
   util/        Dinero, Seguridad, Conexion, Configuracion, Sesion
 test/com/supermercado/pos/pruebas/Pruebas.java
 scripts/       Compilación y pruebas para Windows
-docs/          Explicación de la primera etapa
+docs/          Guías por etapa, modelo ER y evidencias
 sql/           Creación de cuentas, esquema, datos y verificación
 lib/           Driver JDBC descargado localmente, excluido de Git
 config.properties  URL de Oracle, usuario POS y mínimo operativo; sin claves
@@ -142,24 +149,31 @@ reales en Linux con Xvfb, autenticaron, crearon un cajero desde el formulario y
 verificaron los permisos del menú. Hay capturas en
 [evidencias de interfaz](docs/evidencias/etapa3/README.md).
 
+La cuarta entrega pasó 29 pruebas de servicios reales de caja en POS_TEST,
+incluidas aperturas simultáneas, dos cajas vendiendo la última unidad y un cobro
+simultáneo con el cierre. Otras siete pruebas recorrieron ventanas Swing reales
+con Xvfb: apertura, edición del carrito, los tres medios de pago, comprobante,
+recuperación de turno y cierre con faltante de Q20. Ver
+[evidencias de la cuarta entrega](docs/evidencias/etapa4/README.md).
+El login y la administración de usuarios también fueron confirmados en Windows;
+la nueva interfaz de caja necesita la práctica local descrita en su guía.
+
 ## Límites de estas pruebas
 
-Se validan cálculos, cambios del carrito, permisos en memoria y criptografía.
-Estas pruebas no sustituyen los nueve casos obligatorios de la fase 10 del PDF:
-los servicios de turnos, pagos, retiros, reversiones y cierre siguen pendientes.
-Las pruebas Oracle actuales verifican restricciones y rollback JDBC directamente;
-no acreditan el comportamiento de servicios que todavía no están implementados.
+Los casos de servicios cubren cinco comportamientos obligatorios de la fase 10:
+caja ocupada, fondo cero, pago insuficiente, mixto y cierre con diferencia −20.
+Faltan retiro bajo mínimo, rechazo de autorizador cajero, autoautorización y
+reversión excesiva. El escenario completo de Ana con Q690 esperados todavía no
+está implementado: esta entrega llega a Q1,220 antes de retiro y reversión.
 
-El carrito comprueba el stock que tiene en memoria, pero no lo descuenta. Al
-cobrar, el servicio deberá comprobarlo de nuevo en Oracle y descontarlo dentro
-de la misma transacción que guarda la venta y sus pagos.
+El carrito valida existencias en memoria y el servicio vuelve a validarlas en
+Oracle durante la transacción de cobro. Un fallo revierte venta, detalles,
+pagos y stock. Un comprobante es de práctica; no se procesan tarjetas bancarias
+ni se emite factura fiscal. La impresión física no fue probada en cloud.
 
-Las entidades representan datos; `AuthService` autentica y `UsuarioService`
-verifica usuario activo, permisos y jerarquía antes de administrar usuarios.
-La autorización puntual de reversiones y su auditoría siguen pendientes.
-
-Los precios del carrito ya incluyen impuesto, según el PDF. El desglose del
-impuesto se añadirá con la pantalla de cobro; no se suma impuesto al total actual.
+Los permisos se comprueban tanto en interfaz como en servicios. La autorización
+puntual de reversiones y su auditoría siguen pendientes. Los precios ya incluyen
+impuesto; el ticket muestra su desglose sin sumarlo nuevamente al total.
 
 Nunca guardes contraseñas reales en el código o en Git. Los hashes de `test`
 son únicamente datos de pruebas, sin cuentas asociadas.

@@ -2,10 +2,14 @@ package com.supermercado.pos.ui;
 
 import com.supermercado.pos.dominio.Rol;
 import com.supermercado.pos.dominio.Usuario;
+import com.supermercado.pos.dominio.Turno;
+import com.supermercado.pos.servicio.TurnoService;
 import com.supermercado.pos.util.Sesion;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -28,6 +32,10 @@ public final class MenuPrincipalFrame extends JFrame {
         datos.add(new JLabel("Roles: " + usuario.getRoles().stream().map(Rol::getNombre).collect(Collectors.joining(", "))));
         contenido.add(datos, BorderLayout.NORTH);
         JPanel botones = new JPanel(new GridLayout(0, 1, 8, 8));
+        JButton caja = new JButton("Abrir / continuar turno de caja");
+        caja.setName("menu.caja");
+        caja.setEnabled(usuario.tienePermiso("TURNO_ABRIR") && usuario.tienePermiso("VENTA_COBRAR"));
+        botones.add(caja);
         JButton usuarios = new JButton("Administrar usuarios");
         usuarios.setName("menu.usuarios");
         usuarios.setEnabled(usuario.tienePermiso("USUARIO_ADMIN"));
@@ -40,6 +48,27 @@ public final class MenuPrincipalFrame extends JFrame {
         botones.add(usuarios);
         JButton salir = new JButton("Cerrar sesion");
         salir.setName("menu.salir");
+        caja.addActionListener(evento -> {
+            caja.setEnabled(false); salir.setEnabled(false);
+            Tareas.ejecutar(this, () -> new TurnoService().actual(usuario), actual -> {
+                Turno turno = actual.orElse(null);
+                if (turno == null) {
+                    AperturaTurnoFrame apertura = new AperturaTurnoFrame(this, usuario);
+                    apertura.setVisible(true); turno = apertura.getTurnoCreado();
+                }
+                if (turno != null) {
+                    PosFrame puntoVenta = new PosFrame(usuario, turno);
+                    puntoVenta.addWindowListener(new WindowAdapter() {
+                        @Override public void windowClosed(WindowEvent e) {
+                            if (isDisplayable()) { setVisible(true); }
+                        }
+                    });
+                    // El menu permanece oculto mientras la caja esta abierta en pantalla.
+                    // Cerrar esta ventana de caja permite salir de sesion sin cerrar el turno.
+                    setVisible(false); puntoVenta.setVisible(true);
+                }
+            }, () -> { caja.setEnabled(true); salir.setEnabled(true); });
+        });
         salir.addActionListener(evento -> {
             Sesion.cerrar();
             for (Window ventana : Window.getWindows()) { ventana.dispose(); }
@@ -47,6 +76,6 @@ public final class MenuPrincipalFrame extends JFrame {
         });
         botones.add(salir);
         contenido.add(botones, BorderLayout.CENTER);
-        setContentPane(contenido); setSize(490, 270); setLocationRelativeTo(null);
+        setContentPane(contenido); setSize(540, 340); setLocationRelativeTo(null);
     }
 }
