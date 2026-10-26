@@ -27,6 +27,15 @@ public final class Main {
         try { Conexion.configurarClaveTemporal(clave); }
         finally { if (clave != null) { Arrays.fill(clave, '\0'); } }
         Runtime.getRuntime().addShutdownHook(new Thread(Conexion::limpiarClaveTemporal));
+        try (Connection con = Conexion.obtener(); PreparedStatement ps = con.prepareStatement("""
+                SELECT COUNT(*) FROM user_tab_columns
+                WHERE table_name = 'TURNO' AND column_name = 'APERTURA_AUTORIZADA_POR'
+                """); ResultSet rs = ps.executeQuery()) {
+            rs.next();
+            if (rs.getInt(1) == 0) {
+                throw new IllegalStateException("Falta la actualizacion de apertura cero. Ejecuta scripts/actualizar-bd.ps1 y vuelve a iniciar.");
+            }
+        }
         try (Connection con = Conexion.obtener();
                 PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) FROM usuario WHERE username = ?")) {
             ps.setString(1, "admin");

@@ -71,12 +71,17 @@ CREATE TABLE turno (
     cajero_id NUMBER NOT NULL REFERENCES usuario(id),
     apertura TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
     cierre TIMESTAMP,
-    fondo_inicial NUMBER(12,2) NOT NULL CHECK (fondo_inicial > 0),
+    fondo_inicial NUMBER(12,2) NOT NULL,
+    apertura_autorizada_por NUMBER CONSTRAINT fk_turno_apertura_autor REFERENCES usuario(id),
     efectivo_declarado NUMBER(12,2) CHECK (efectivo_declarado >= 0),
     efectivo_esperado NUMBER(12,2),
     diferencia NUMBER(12,2),
     estado VARCHAR2(10) DEFAULT 'ABIERTO' NOT NULL
         CHECK (estado IN ('ABIERTO', 'CERRADO')),
+    CONSTRAINT ck_turno_fondo_autorizado CHECK (
+        fondo_inicial >= 0 AND (fondo_inicial > 0 OR apertura_autorizada_por IS NOT NULL)),
+    CONSTRAINT ck_turno_autorizacion_ajena CHECK (
+        apertura_autorizada_por IS NULL OR apertura_autorizada_por <> cajero_id),
     CONSTRAINT ck_turno_cierre CHECK (
         (estado = 'ABIERTO' AND cierre IS NULL)
         OR (estado = 'CERRADO' AND cierre IS NOT NULL))

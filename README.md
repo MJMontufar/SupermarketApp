@@ -28,6 +28,11 @@ cobro en efectivo/tarjeta/mixto, comprobante y cierre con conteo y diferencia.
 La venta y el descuento de stock son una transacción; cobrar y cerrar comparten
 un bloqueo de turno. No se necesitan cambios SQL en bases ya preparadas.
 
+La apertura con fondo cero ahora requiere credenciales de otro usuario de nivel
+supervisor o superior, tres intentos por solicitud y auditoría. Consulta
+[la actualización de base y la práctica con Ana/Marta](docs/apertura-cero.md).
+Para una base existente ejecuta `scripts/actualizar-bd.ps1` antes de iniciar.
+
 Siguen pendientes retiros a bóveda, reversiones autorizadas, catálogos editables,
 la matriz de roles/permisos y la asignación múltiple de roles y permisos extra.
 Las pruebas sin Oracle funcionan por separado.
@@ -46,7 +51,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\iniciar.ps1
 
 Primero ingresa la clave de Oracle de **pos** en la consola. Después se abre la
 ventana de login: usa **admin / Admin123!** para la cuenta de entrenamiento.
-Son credenciales distintas. No se necesitan cambios SQL para las etapas tercera y cuarta.
+Son credenciales distintas. La excepción de apertura con Q0 requiere aplicar
+la actualización 04 una vez; `scripts/actualizar-bd.ps1` lo hace mediante JDBC
+conservando los datos. No repitas los SQL 00 y 01.
 
 Consulta [la guía de login y usuarios](docs/login-y-usuarios.md) para actualizar
 tu copia y crear a Ana, Luis y Marta. Después sigue la
@@ -158,6 +165,12 @@ recuperación de turno y cierre con faltante de Q20. Ver
 El login y la administración de usuarios también fueron confirmados en Windows;
 la nueva interfaz de caja necesita la práctica local descrita en su guía.
 
+La apertura cero añade 24 pruebas de servicios y restricciones y tres gráficas:
+autorización, jerarquía, cancelación, límite de tres fallos, auditoría y limpieza
+de claves. La migración pasó por JDBC y SQL*Plus en POS/POS_TEST y se repitió
+con datos existentes conservados. El total es 132 pruebas correctas; la nueva
+excepción necesita aún la comprobación manual en Windows.
+
 ## Límites de estas pruebas
 
 Los casos de servicios cubren cinco comportamientos obligatorios de la fase 10:
@@ -172,7 +185,8 @@ pagos y stock. Un comprobante es de práctica; no se procesan tarjetas bancarias
 ni se emite factura fiscal. La impresión física no fue probada en cloud.
 
 Los permisos se comprueban tanto en interfaz como en servicios. La autorización
-puntual de reversiones y su auditoría siguen pendientes. Los precios ya incluyen
+y auditoría de apertura cero están implementadas; aplicarlas a retiros y
+reversiones sigue pendiente. Los precios ya incluyen
 impuesto; el ticket muestra su desglose sin sumarlo nuevamente al total.
 
 Nunca guardes contraseñas reales en el código o en Git. Los hashes de `test`

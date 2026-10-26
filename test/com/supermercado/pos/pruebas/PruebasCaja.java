@@ -38,11 +38,11 @@ import java.util.concurrent.TimeUnit;
 public final class PruebasCaja {
     private final TurnoService turnos = new TurnoService();
     private final VentaService ventas = new VentaService();
-    private final List<Long> usuarios = new ArrayList<>();
+    final List<Long> usuarios = new ArrayList<>();
     final List<Long> cajas = new ArrayList<>();
     private final List<Long> productos = new ArrayList<>();
     Usuario ana;
-    private Usuario luis;
+    Usuario luis;
     long arroz;
     long leche;
     private int ejecutadas;
@@ -54,27 +54,27 @@ public final class PruebasCaja {
         try { limpiarOperaciones(); reiniciarProductos(); prueba.ejecutar(); System.out.println("OK    " + nombre); }
         catch (Exception | AssertionError e) { fallos++; System.out.println("FALLO " + nombre); e.printStackTrace(System.out); }
     }
-    private static BigDecimal q(String texto) { return new BigDecimal(texto).setScale(2); }
-    private static void verificar(boolean condicion) { if (!condicion) { throw new AssertionError("Resultado inesperado"); } }
-    private static void igual(BigDecimal obtenido, String esperado) { verificar(obtenido.compareTo(q(esperado)) == 0); }
-    private static void rechaza(Class<? extends RuntimeException> tipo, Runnable accion) {
+    static BigDecimal q(String texto) { return new BigDecimal(texto).setScale(2); }
+    static void verificar(boolean condicion) { if (!condicion) { throw new AssertionError("Resultado inesperado"); } }
+    static void igual(BigDecimal obtenido, String esperado) { verificar(obtenido.compareTo(q(esperado)) == 0); }
+    static void rechaza(Class<? extends RuntimeException> tipo, Runnable accion) {
         try { accion.run(); }
         catch (RuntimeException e) { if (tipo.isInstance(e)) { return; } throw e; }
         throw new AssertionError("Se esperaba " + tipo.getSimpleName());
     }
-    private static void ejecutarSql(String sql, Object... parametros) throws SQLException {
+    static void ejecutarSql(String sql, Object... parametros) throws SQLException {
         try (Connection con = Conexion.obtener(); PreparedStatement ps = con.prepareStatement(sql)) {
             for (int i = 0; i < parametros.length; i++) { ps.setObject(i + 1, parametros[i]); }
             ps.executeUpdate();
         }
     }
-    private static BigDecimal numero(String sql, Object... parametros) throws SQLException {
+    static BigDecimal numero(String sql, Object... parametros) throws SQLException {
         try (Connection con = Conexion.obtener(); PreparedStatement ps = con.prepareStatement(sql)) {
             for (int i = 0; i < parametros.length; i++) { ps.setObject(i + 1, parametros[i]); }
             try (ResultSet rs = ps.executeQuery()) { rs.next(); return rs.getBigDecimal(1); }
         }
     }
-    private static long insertar(String sql, Object... parametros) throws SQLException {
+    static long insertar(String sql, Object... parametros) throws SQLException {
         try (Connection con = Conexion.obtener(); PreparedStatement ps = con.prepareStatement(sql, new String[] {"ID"})) {
             for (int i = 0; i < parametros.length; i++) { ps.setObject(i + 1, parametros[i]); }
             ps.executeUpdate();
@@ -295,7 +295,7 @@ public final class PruebasCaja {
         ejecutarSql("UPDATE producto SET stock = 30, activo = 1, precio = 30 WHERE id = ?", arroz);
         ejecutarSql("UPDATE producto SET stock = 30, activo = 1, precio = 20 WHERE id = ?", leche);
     }
-    private void limpiarOperaciones() throws SQLException {
+    void limpiarOperaciones() throws SQLException {
         for (long id : usuarios) {
             String turnosPropios = "SELECT id FROM turno WHERE cajero_id = ?";
             String ventasPropias = "SELECT id FROM venta WHERE turno_id IN (" + turnosPropios + ")";
@@ -304,7 +304,8 @@ public final class PruebasCaja {
                     "DELETE FROM venta_detalle WHERE venta_id IN (" + ventasPropias + ")",
                     "DELETE FROM venta WHERE turno_id IN (" + turnosPropios + ")",
                     "DELETE FROM movimiento_caja WHERE turno_id IN (" + turnosPropios + ")",
-                    "DELETE FROM turno WHERE cajero_id = ?")) { ejecutarSql(sql, id); }
+                    "DELETE FROM turno WHERE cajero_id = ?",
+                    "DELETE FROM auditoria_autorizacion WHERE solicitado_por = ?")) { ejecutarSql(sql, id); }
         }
     }
     void limpiar() throws SQLException {
@@ -312,6 +313,7 @@ public final class PruebasCaja {
         for (long id : productos) { ejecutarSql("DELETE FROM producto WHERE id = ?", id); }
         for (long id : cajas) { ejecutarSql("DELETE FROM caja WHERE id = ?", id); }
         for (long id : usuarios) {
+            ejecutarSql("DELETE FROM usuario_permiso WHERE usuario_id = ?", id);
             ejecutarSql("DELETE FROM usuario_rol WHERE usuario_id = ?", id);
             ejecutarSql("DELETE FROM usuario WHERE id = ?", id);
         }
