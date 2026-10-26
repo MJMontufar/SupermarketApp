@@ -45,6 +45,7 @@ public final class ReversionFrame extends JDialog {
     public ReversionFrame(Window padre, Turno turno, Usuario actor) {
         super(padre, "Supermercado - Reversion de producto", ModalityType.APPLICATION_MODAL);
         this.turno = turno; this.actor = actor; setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        Tema.primario(solicitar);
         folio.setName("reversion.folio"); motivo.setName("reversion.motivo"); cantidad.setName("reversion.cantidad");
         buscar.setName("reversion.buscar"); solicitar.setName("reversion.solicitar"); tabla.setName("reversion.tabla"); estado.setName("reversion.estado");
         tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

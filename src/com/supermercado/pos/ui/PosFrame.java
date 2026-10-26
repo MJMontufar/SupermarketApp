@@ -84,6 +84,7 @@ public final class PosFrame extends JFrame {
                 if (!ocupado && confirmarDescartar()) { dispose(); }
             }
         });
+        Tema.primario(cobrar); Tema.peligro(cancelar);
         codigo.setName("pos.codigo"); cantidad.setName("pos.cantidad"); productos.setName("pos.producto");
         agregar.setName("pos.agregar"); cobrar.setName("pos.cobrar"); tabla.setName("pos.carrito");
         cerrar.setName("pos.cerrar"); estado.setName("pos.estado"); totales.setName("pos.totales");
@@ -104,12 +105,12 @@ public final class PosFrame extends JFrame {
         norte.add(lector);
         JPanel seleccion = new JPanel(new FlowLayout(FlowLayout.LEFT)); seleccion.add(productos); seleccion.add(agregar); seleccion.add(actualizar);
         norte.add(seleccion); norte.add(estado);
-        JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel botones = new JPanel(new GridLayout(2, 3, 8, 8));
         botones.add(quitar); botones.add(cancelar); botones.add(cobrar); botones.add(retiro); botones.add(reversion); botones.add(cerrar);
         JPanel sur = new JPanel(new BorderLayout(8, 8)); sur.add(totales, BorderLayout.NORTH); sur.add(botones, BorderLayout.SOUTH);
         JPanel contenido = new JPanel(new BorderLayout(12, 12)); contenido.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
         contenido.add(norte, BorderLayout.NORTH); contenido.add(new JScrollPane(tabla), BorderLayout.CENTER); contenido.add(sur, BorderLayout.SOUTH);
-        setContentPane(contenido); setSize(1030, 560); setLocationRelativeTo(null);
+        setContentPane(contenido); setSize(1100, 680); Tema.acomodar(this);
         codigo.addActionListener(e -> agregarCodigo()); agregar.addActionListener(e -> agregar((Producto) productos.getSelectedItem()));
         actualizar.addActionListener(e -> cargar());
         quitar.addActionListener(e -> {

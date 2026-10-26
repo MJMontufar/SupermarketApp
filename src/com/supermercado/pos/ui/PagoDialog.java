@@ -47,6 +47,7 @@ public final class PagoDialog extends JDialog {
         addWindowListener(new WindowAdapter() {
             @Override public void windowClosing(WindowEvent e) { if (!ocupado) { dispose(); } }
         });
+        Tema.primario(confirmar);
         metodo.setName("pago.metodo"); efectivo.setName("pago.efectivo"); tarjeta.setName("pago.tarjeta");
         confirmar.setName("pago.confirmar"); aviso.setName("pago.aviso"); cambio.setName("pago.cambio");
         JPanel campos = new JPanel(new GridLayout(0, 2, 8, 12));
@@ -58,7 +59,7 @@ public final class PagoDialog extends JDialog {
         JPanel botones = new JPanel(new FlowLayout(FlowLayout.RIGHT)); botones.add(cancelar); botones.add(confirmar);
         JPanel contenido = new JPanel(new BorderLayout(12, 12)); contenido.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         contenido.add(campos, BorderLayout.CENTER); contenido.add(botones, BorderLayout.SOUTH);
-        setContentPane(contenido); setSize(650, 285); setLocationRelativeTo(padre);
+        setContentPane(contenido); setSize(730, 350); setLocationRelativeTo(padre);
         DocumentListener escucha = new DocumentListener() {
             @Override public void insertUpdate(DocumentEvent e) { calcular(); }
             @Override public void removeUpdate(DocumentEvent e) { calcular(); }

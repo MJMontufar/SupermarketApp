@@ -29,6 +29,7 @@ public final class CajaDialog extends JDialog {
     private boolean ocupado;
     public CajaDialog(Window padre,CajaCatalogo original,Usuario actor){
         super(padre,original==null?"Nueva caja":"Editar caja",ModalityType.APPLICATION_MODAL);this.original=original;this.actor=actor;
+        Tema.primario(guardar);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);addWindowListener(new WindowAdapter(){@Override public void windowClosing(WindowEvent e){if(!ocupado){dispose();}}});
         numero.setName("caja.numero");nombre.setName("caja.nombre");activa.setName("caja.activa");guardar.setName("caja.guardar");
         if(original!=null){numero.setValue(original.numero());nombre.setText(original.nombre());activa.setSelected(original.activa());}

@@ -26,6 +26,8 @@ La única biblioteca externa de la aplicación es `lib/ojdbc11.jar`.
   historial. Se evita sobrescribir stock cambiado por una venta y desactivar
   o renumerar una caja con turno abierto.
 - Comprobantes y reportes de práctica con vista previa e impresión del JDK.
+- Tema Swing con grises, acentos esmeralda/violeta y menú por módulos; fotos
+  opcionales de productos desde JPG/PNG, con vista previa en el catálogo.
 
 Todas las operaciones con dinero usan `BigDecimal`, escala 2 y `HALF_UP`.
 La autorización se comprueba en servicios además de la interfaz. No se permiten
@@ -87,6 +89,7 @@ práctica completa de caja, administración, pruebas y capturas. Las guías deta
 - [Apertura Q0 autorizada](docs/apertura-cero.md).
 - [Modelo ER final](docs/modelo-er.md).
 - [Mapa de las 12 pantallas y evidencias](docs/evidencias/README.md).
+- [Nuevo diseño, fotografías y respaldo de imágenes](docs/diseno-y-fotos.md).
 
 El escenario completo fue comprobado: fondo Q1000 + efectivo neto Q220 − retiro
 Q500 − reembolso Q30 = **Q690 esperados**. Con Q680 contados, diferencia **−Q10**.
@@ -106,16 +109,18 @@ Las secuencias de identidad pueden avanzar aun después de rollback.
 
 También existen scripts separados: `pruebas.ps1`, `pruebas-oracle.ps1`,
 `pruebas-login.ps1`, `pruebas-caja.ps1`, `pruebas-apertura-cero.ps1`,
-`pruebas-negocio.ps1` y `pruebas-administracion.ps1`.
+`pruebas-negocio.ps1`, `pruebas-administracion.ps1` y `pruebas-fotos.ps1`.
+Este último añade 12 casos de la función opcional, separados de las 100 pruebas rápidas.
 
-La regresión completa pasó **204 casos** con Java 21, Oracle XE 21.3 y ojdbc11
+La regresión completa pasó **219 casos** con Java 21, Oracle XE 21.3 y ojdbc11
 21.11: 37 dominio, 9 integridad Oracle, 19 login/usuarios, 29 apertura/cobro/cierre,
-24 apertura cero, 35 negocio integral, 28 administración y 23 gráficos con Swing
+24 apertura cero, 35 negocio integral, 28 administración, 12 fotografías y 26 gráficos con Swing
 real en Linux/Xvfb. Incluye los nueve casos obligatorios de la fase 10, concurrencia
 con conexiones reales y la fase 11. Compilación sin advertencias con `-Xlint:all -Werror`.
 
-El estudiante ya confirmó en Windows JDK/JDBC, login y administración básica.
-Las nuevas ventanas deben comprobarse allí con la guía y capturas de su práctica.
+El estudiante confirmó en Windows las 100 pruebas rápidas de dominio, negocio
+y administración. El nuevo diseño y las fotografías deben comprobarse allí con
+la guía y capturas de su práctica.
 Las evidencias del repositorio son de pruebas automatizadas en POS_TEST/Linux;
 la impresión física no fue comprobada.
 
@@ -157,6 +162,7 @@ scripts/       Compilación, driver, ejecución, migración y verificación para
 docs/          Guías, ER, lista de entrega y evidencias
 lib/           Driver descargado localmente, excluido de Git
 config.properties  URL, cuenta técnica y mínimo operativo; sin contraseña
+datos/fotos/   Copias locales de fotos, excluidas de Git; incluir en respaldos
 ```
 
 El conteo por denominaciones y otros retos opcionales no se implementaron.

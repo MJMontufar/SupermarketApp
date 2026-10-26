@@ -57,6 +57,7 @@ public final class AsignacionPermisosDialog extends JDialog {
     public AsignacionPermisosDialog(Window padre,Usuario actor){
         super(padre,"Supermercado - Asignacion de roles y permisos",ModalityType.APPLICATION_MODAL);this.actor=actor;
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);addWindowListener(new WindowAdapter(){@Override public void windowClosing(WindowEvent e){if(!ocupado){dispose();}}});
+        Tema.primario(guardar);
         usuarios.setName("asignacion.usuario");tablaRoles.setName("asignacion.roles");tablaPermisos.setName("asignacion.permisos");guardar.setName("asignacion.guardar");cancelar.setName("asignacion.cerrar");
         tablaRoles.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JPanel arriba=new JPanel(new FlowLayout(FlowLayout.LEFT));arriba.add(new JLabel("Usuario de nivel inferior:"));arriba.add(usuarios);

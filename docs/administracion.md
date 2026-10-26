@@ -26,6 +26,8 @@ con sus roles originales para el escenario de caja.
    existencias **5** y estado Activo. Si ese código ya existe, elige otro.
    Búscalo en la tabla, edítalo y prueba desactivarlo: permanece en el catálogo,
    pero no aparece disponible para ventas. No se borra su historial.
+   Opcionalmente, selecciona la fila del producto y pulsa **Elegir fotografía...**
+   para importar un JPG o PNG. Consulta [fotos y respaldo](diseno-y-fotos.md).
 6. Abre **Catálogo de cajas → Nueva caja**. Usa un número libre, por ejemplo
    **4**, nombre `Caja de practica` y estado Activa.
 7. Para comprobar la protección de caja abierta, abre un turno con esa caja y

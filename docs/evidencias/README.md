@@ -29,11 +29,14 @@ Resultados adicionales:
 - [Recibo de retiro](final/recibo-retiro.png) y [reversión](final/comprobante-reversion.png).
 - [Fondo cero autorizado](apertura-cero/README.md).
 
-Las suites gráficas suman 23 casos: usuarios 4, caja 7, apertura cero 3, cortes 4
-y administración 5. La regresión completa suma 204 casos, incluidos los nueve
+Las suites gráficas suman 26 casos: usuarios 4, caja 7, apertura cero 3, cortes 4,
+administración 5 y fotos 3. La regresión completa suma 219 casos, incluidos los nueve
 obligatorios de fase 10 y el escenario de fase 11. La impresión física no se
 probó; se verificaron los comprobantes en pantalla.
 
 Para la entrega, sigue [la lista de trabajo](../entrega.md) y conserva también
 las capturas de tu práctica en Windows con Ana, Luis y Marta. Las carpetas por
 etapa conservan evidencias históricas; `final` reúne las de la versión actual.
+
+El [diseño y las fotos opcionales](../diseno-y-fotos.md) tienen capturas adicionales
+en `diseno`. El archivo de color es una imagen sintética de prueba.

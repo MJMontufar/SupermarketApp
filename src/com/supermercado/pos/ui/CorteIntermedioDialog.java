@@ -32,6 +32,7 @@ public final class CorteIntermedioDialog extends JDialog {
         super(padre, "Supermercado - Corte intermedio", ModalityType.APPLICATION_MODAL);
         this.turno = turno; this.actor = actor;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        Tema.primario(solicitar);
         resumen.setEditable(false); resumen.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13)); resumen.setName("retiro.resumen");
         monto.setName("retiro.monto"); solicitar.setName("retiro.solicitar"); volver.setName("retiro.volver");
         JPanel entrada = new JPanel(new FlowLayout(FlowLayout.LEFT)); entrada.add(new JLabel("Monto a entregar a boveda (Q):")); entrada.add(monto);

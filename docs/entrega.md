@@ -89,9 +89,13 @@ El script se detiene si alguna falla. Las nueve pruebas obligatorias de la fase
 10 son los primeros nueve casos de la suite de negocio. El resultado automatizado
 de la fase 11 queda en `out/escenario-completo.txt`.
 
-En cloud se ejecutó además la regresión completa: **204 pruebas**, incluidas
-las suites previas y 23 pruebas de ventanas con Oracle real. Ninguna suite de
+En cloud se ejecutó además la regresión completa: **219 pruebas**, incluidas
+las suites previas y 26 pruebas de ventanas con Oracle real. Ninguna suite de
 escrituras usa POS; todas comprueban POS_TEST/XEPDB1 antes de preparar datos.
+
+La presentación actual usa el tema Swing nuevo. Si quieres añadir fotografías
+al catálogo, sigue [la guía de diseño y fotos](diseno-y-fotos.md). Es opcional;
+conserva la carpeta `datos/fotos` al respaldar o mover tu proyecto.
 
 ## 6. Guardar las capturas requeridas
 

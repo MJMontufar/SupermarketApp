@@ -40,6 +40,7 @@ public final class CierreTurnoFrame extends JDialog {
         addWindowListener(new WindowAdapter() {
             @Override public void windowClosing(WindowEvent e) { if (!ocupado) { dispose(); } }
         });
+        Tema.primario(cerrar);
         resumen.setEditable(false); resumen.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13)); resumen.setName("cierre.resumen");
         contado.setName("cierre.contado"); cerrar.setName("cierre.confirmar");
         JPanel entrada = new JPanel(new FlowLayout(FlowLayout.LEFT));

@@ -32,18 +32,30 @@ public final class LoginFrame extends JFrame {
         ingresar.setName("login.ingresar");
         error.setName("login.error");
         error.setForeground(new Color(170, 30, 30));
-        JPanel campos = new JPanel(new GridLayout(0, 1, 6, 6));
+        Tema.primario(ingresar);
+        JPanel campos = new JPanel(new GridLayout(0, 1, 6, 6)); campos.setOpaque(false);
         campos.add(new JLabel("Usuario")); campos.add(usuario);
         campos.add(new JLabel("Contrasena")); campos.add(clave);
         campos.add(error); campos.add(ingresar);
-        JPanel contenido = new JPanel(new BorderLayout(12, 12));
-        contenido.setBorder(BorderFactory.createEmptyBorder(22, 24, 22, 24));
-        contenido.add(new JLabel("Sistema de supermercado"), BorderLayout.NORTH);
-        contenido.add(campos, BorderLayout.CENTER);
+        JPanel formulario = new JPanel(new BorderLayout(16, 24)); formulario.setBackground(Color.WHITE);
+        formulario.setBorder(BorderFactory.createEmptyBorder(44, 36, 44, 36));
+        formulario.add(Tema.cabecera("Bienvenido", "Ingresa con tu cuenta de trabajo."), BorderLayout.NORTH);
+        formulario.add(campos, BorderLayout.CENTER);
+        formulario.add(Tema.secundario("Punto de venta y administracion"), BorderLayout.SOUTH);
+        JPanel marca = Tema.oscuro(); marca.setLayout(new BorderLayout(16, 30)); marca.setPreferredSize(new java.awt.Dimension(290, 430));
+        marca.setBorder(BorderFactory.createEmptyBorder(40, 28, 40, 28));
+        JLabel logo = new JLabel("SM / SUPERMERCADO"); logo.setForeground(Color.WHITE); logo.setFont(new java.awt.Font(java.awt.Font.SANS_SERIF, java.awt.Font.BOLD, 17));
+        JLabel mensaje = new JLabel("<html>Todo listo<br>para una buena<br>jornada.</html>");
+        mensaje.setVerticalAlignment(JLabel.TOP); mensaje.setForeground(Color.WHITE);
+        mensaje.setFont(new java.awt.Font(java.awt.Font.SANS_SERIF, java.awt.Font.BOLD, 28));
+        mensaje.setBorder(BorderFactory.createEmptyBorder(62, 0, 0, 0));
+        JLabel pie = new JLabel("Ventas · Equipo · Inventario"); pie.setForeground(new Color(0xA7F3D0));
+        marca.add(logo, BorderLayout.NORTH); marca.add(mensaje, BorderLayout.CENTER); marca.add(pie, BorderLayout.SOUTH);
+        JPanel contenido = new JPanel(new BorderLayout()); contenido.add(marca, BorderLayout.WEST); contenido.add(formulario, BorderLayout.CENTER);
         setContentPane(contenido);
         getRootPane().setDefaultButton(ingresar);
         ingresar.addActionListener(evento -> autenticar());
-        pack(); setResizable(false); setLocationRelativeTo(null);
+        setSize(810, 500); Tema.acomodar(this); setResizable(false);
     }
 
     private void autenticar() {
