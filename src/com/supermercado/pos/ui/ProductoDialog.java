@@ -30,6 +30,7 @@ public final class ProductoDialog extends JDialog {
     private boolean ocupado;
     public ProductoDialog(Window padre,Producto original,Usuario actor){
         super(padre,original==null?"Nuevo producto":"Editar producto",ModalityType.APPLICATION_MODAL);this.original=original;this.actor=actor;
+        Tema.primario(guardar);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);addWindowListener(new WindowAdapter(){@Override public void windowClosing(WindowEvent e){if(!ocupado){dispose();}}});
         codigo.setName("producto.codigo");nombre.setName("producto.nombre");precio.setName("producto.precio");impuesto.setName("producto.impuesto");stock.setName("producto.stock");activo.setName("producto.activo");guardar.setName("producto.guardar");
         if(original!=null){codigo.setText(original.getCodigoBarras());nombre.setText(original.getNombre());precio.setText(original.getPrecio().toPlainString());impuesto.setText(original.getPorcentajeImpuesto().toPlainString());stock.setValue(original.getStock());activo.setSelected(original.isActivo());}

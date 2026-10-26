@@ -37,6 +37,7 @@ public final class UsuarioDialog extends JDialog {
         addWindowListener(new WindowAdapter() {
             @Override public void windowClosed(WindowEvent evento) { clave.setText(""); }
         });
+        Tema.primario(guardar);
         username.setName("usuario.username"); nombre.setName("usuario.nombre");
         clave.setName("usuario.clave"); activo.setName("usuario.activo");
         guardar.setName("usuario.guardar"); cancelar.setName("usuario.cancelar");

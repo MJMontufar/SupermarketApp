@@ -3,3 +3,4 @@ bin-vscode/
 *.class
 lib/*.jar
 config.local.properties
+datos/fotos/

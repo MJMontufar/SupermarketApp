@@ -9,7 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Arrays;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import com.supermercado.pos.ui.Tema;
 
 public final class Main {
     private Main() { }
@@ -44,7 +44,7 @@ public final class Main {
                 if (rs.getInt(1) == 0) { throw new IllegalStateException("Faltan los datos iniciales del proyecto"); }
             }
         }
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        Tema.instalar();
         SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
     }
 }

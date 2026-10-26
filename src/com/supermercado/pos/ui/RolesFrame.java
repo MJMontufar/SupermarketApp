@@ -51,6 +51,7 @@ public final class RolesFrame extends JFrame {
     private record Carga(List<Rol> roles,List<Permiso> permisos){ }
     public RolesFrame(Usuario actor){
         super("Supermercado - Roles y permisos");this.actor=actor;setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        Tema.primario(guardar);
         tabla.setName("roles.lista");permisosTabla.setName("roles.matriz");nombre.setName("roles.nombre");nivel.setName("roles.nivel");guardar.setName("roles.guardar");nuevo.setName("roles.nuevo");
         tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JPanel datos=new JPanel(new FlowLayout(FlowLayout.LEFT));datos.add(new JLabel("Nombre:"));datos.add(nombre);datos.add(new JLabel("Nivel:"));datos.add(nivel);

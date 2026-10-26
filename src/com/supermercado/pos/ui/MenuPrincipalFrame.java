@@ -27,14 +27,19 @@ public final class MenuPrincipalFrame extends JFrame {
     public MenuPrincipalFrame(Usuario usuario) {
         super("Supermercado - Inicio");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        JPanel contenido = new JPanel(new BorderLayout(16, 16));
-        contenido.setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
-        JPanel datos = new JPanel(new GridLayout(0, 1, 8, 8));
-        datos.add(new JLabel("Usuario: " + usuario.getUsername()));
-        datos.add(new JLabel("Nombre: " + usuario.getNombreCompleto()));
-        datos.add(new JLabel("Roles: " + usuario.getRoles().stream().map(Rol::getNombre).collect(Collectors.joining(", "))));
-        contenido.add(datos, BorderLayout.NORTH);
-        JPanel botones = new JPanel(new GridLayout(0, 1, 8, 8));
+        JPanel contenido = new JPanel(new BorderLayout());
+        JPanel lateral = Tema.oscuro(); lateral.setLayout(new BorderLayout(12, 28));
+        lateral.setPreferredSize(new java.awt.Dimension(240, 0)); lateral.setBorder(BorderFactory.createEmptyBorder(28, 24, 24, 24));
+        JLabel marca = new JLabel("SM / SUPERMERCADO"); marca.setForeground(java.awt.Color.WHITE);
+        marca.setFont(new java.awt.Font(java.awt.Font.SANS_SERIF, java.awt.Font.BOLD, 16)); lateral.add(marca, BorderLayout.NORTH);
+        JLabel identidad = new JLabel("<html><div style='width:145px'>SESION ACTUAL<br><br><b>" + Tema.escapar(usuario.getUsername()) + "</b><br>"
+                + Tema.escapar(usuario.getNombreCompleto() == null ? "" : usuario.getNombreCompleto()) + "<br><br>"
+                + Tema.escapar(usuario.getRoles().stream().map(Rol::getNombre).collect(Collectors.joining(", "))) + "</div></html>");
+        identidad.setVerticalAlignment(JLabel.TOP); identidad.setForeground(new java.awt.Color(0xCBD5E1));
+        identidad.setFont(new java.awt.Font(java.awt.Font.SANS_SERIF, java.awt.Font.PLAIN, 14)); lateral.add(identidad, BorderLayout.CENTER);
+        JPanel principal = new JPanel(new BorderLayout(20, 24)); principal.setBorder(BorderFactory.createEmptyBorder(32, 28, 28, 28));
+        principal.add(Tema.cabecera("Panel principal", "Selecciona un modulo para comenzar."), BorderLayout.NORTH);
+        JPanel botones = new JPanel(new GridLayout(3, 2, 14, 14)); botones.setOpaque(false);
         JButton caja = new JButton("Abrir / continuar turno de caja");
         caja.setName("menu.caja");
         caja.setEnabled(usuario.tienePermiso("TURNO_ABRIR") && usuario.tienePermiso("VENTA_COBRAR"));
@@ -70,7 +75,9 @@ public final class MenuPrincipalFrame extends JFrame {
             if (cajasAbiertas == null || !cajasAbiertas.isDisplayable()) { cajasAbiertas = new CajasFrame(usuario); }
             cajasAbiertas.setVisible(true); cajasAbiertas.toFront();
         }); botones.add(cajas);
-        JButton salir = new JButton("Cerrar sesion");
+        Tema.tarjeta(caja, "01"); Tema.tarjeta(usuarios, "02"); Tema.tarjeta(roles, "03");
+        Tema.tarjeta(asignacion, "04"); Tema.tarjeta(productos, "05"); Tema.tarjeta(cajas, "06");
+        JButton salir = new JButton("Cerrar sesion"); Tema.peligro(salir);
         salir.setName("menu.salir");
         caja.addActionListener(evento -> {
             caja.setEnabled(false); salir.setEnabled(false);
@@ -98,8 +105,10 @@ public final class MenuPrincipalFrame extends JFrame {
             for (Window ventana : Window.getWindows()) { ventana.dispose(); }
             new LoginFrame().setVisible(true);
         });
-        botones.add(salir);
-        contenido.add(botones, BorderLayout.CENTER);
-        setContentPane(contenido); setSize(560, 560); setLocationRelativeTo(null);
+        lateral.add(salir, BorderLayout.SOUTH);
+        principal.add(botones, BorderLayout.CENTER);
+        principal.add(Tema.secundario("Operaciones de caja, equipo y catalogos en un mismo lugar."), BorderLayout.SOUTH);
+        contenido.add(lateral, BorderLayout.WEST); contenido.add(principal, BorderLayout.CENTER);
+        setContentPane(contenido); setSize(1060, 660); Tema.acomodar(this);
     }
 }

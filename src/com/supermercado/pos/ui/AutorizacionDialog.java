@@ -39,6 +39,7 @@ public final class AutorizacionDialog extends JDialog {
     public AutorizacionDialog(Window padre, Usuario cajero, String resumen, SolicitudAutorizada<?> solicitud) {
         super(padre, "Supermercado - Autorizacion de supervisor", ModalityType.APPLICATION_MODAL);
         this.solicitud = solicitud;
+        Tema.primario(confirmar);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override public void windowClosing(WindowEvent e) { if (!ocupado) { dispose(); } }
@@ -57,7 +58,7 @@ public final class AutorizacionDialog extends JDialog {
         JPanel sur = new JPanel(new BorderLayout(8, 8)); sur.add(estado, BorderLayout.CENTER); sur.add(botones, BorderLayout.SOUTH);
         JPanel contenido = new JPanel(new BorderLayout(16, 16)); contenido.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         contenido.add(campos, BorderLayout.CENTER); contenido.add(sur, BorderLayout.SOUTH);
-        setContentPane(contenido); setSize(800, 370); setLocationRelativeTo(padre);
+        setContentPane(contenido); setSize(840, 450); setLocationRelativeTo(padre);
         confirmar.addActionListener(e -> autorizar()); cancelar.addActionListener(e -> dispose());
         getRootPane().setDefaultButton(confirmar);
     }

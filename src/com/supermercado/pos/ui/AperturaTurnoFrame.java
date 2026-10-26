@@ -43,6 +43,7 @@ public final class AperturaTurnoFrame extends JDialog {
         addWindowListener(new WindowAdapter() {
             @Override public void windowClosing(WindowEvent e) { if (!ocupado) { dispose(); } }
         });
+        Tema.primario(abrir);
         cajas.setName("apertura.caja"); fondo.setName("apertura.fondo"); abrir.setName("apertura.abrir");
         estado.setName("apertura.estado");
         JPanel campos = new JPanel(new GridLayout(0, 2, 8, 12));
