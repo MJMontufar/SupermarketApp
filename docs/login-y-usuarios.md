@@ -119,4 +119,5 @@ Linux y Oracle real, usando solo APIs estándar de Swing/AWT. Esa automatizació
 requiere una clave técnica configurada en el entorno del proceso y POS_TEST.
 No es necesaria para abrir manualmente la aplicación en Windows.
 
-Estas pruebas no sustituyen los casos pendientes del ciclo de caja del PDF.
+Estas pruebas complementan los casos de [negocio integral](ciclo-completo.md) y
+[administración](administracion.md), disponibles en las entregas posteriores.

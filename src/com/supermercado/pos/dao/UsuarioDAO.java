@@ -12,6 +12,22 @@ import java.util.List;
 import java.util.Optional;
 
 public final class UsuarioDAO {
+    public void reemplazarAsignacion(Connection con, long usuario, java.util.Set<Long> roles, java.util.Set<Long> extras) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement("DELETE FROM usuario_rol WHERE usuario_id=?")) {
+            ps.setLong(1, usuario); ps.executeUpdate();
+        }
+        try (PreparedStatement ps = con.prepareStatement("DELETE FROM usuario_permiso WHERE usuario_id=?")) {
+            ps.setLong(1, usuario); ps.executeUpdate();
+        }
+        try (PreparedStatement ps = con.prepareStatement("INSERT INTO usuario_rol (usuario_id,rol_id) VALUES (?,?)")) {
+            for (long rol : roles) { ps.setLong(1, usuario); ps.setLong(2, rol); ps.addBatch(); }
+            ps.executeBatch();
+        }
+        try (PreparedStatement ps = con.prepareStatement("INSERT INTO usuario_permiso (usuario_id,permiso_id) VALUES (?,?)")) {
+            for (long permiso : extras) { ps.setLong(1, usuario); ps.setLong(2, permiso); ps.addBatch(); }
+            ps.executeBatch();
+        }
+    }
     private final RolDAO rolDao = new RolDAO();
 
     public Optional<Usuario> buscarPorUsername(Connection con, String username) throws SQLException {

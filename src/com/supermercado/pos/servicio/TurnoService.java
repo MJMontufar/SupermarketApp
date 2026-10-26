@@ -70,7 +70,7 @@ public final class TurnoService {
         return new AperturaCero(actor, cajaId);
     }
     /** No acepta un Usuario supuesto supervisor: siempre solicita sus credenciales. */
-    public final class AperturaCero {
+    public final class AperturaCero implements SolicitudAutorizada<Turno> {
         private final Usuario actor;
         private final long caja;
         private final AutorizacionService.Solicitud solicitud;

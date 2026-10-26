@@ -37,8 +37,8 @@ public final class Usuario {
     public Set<Rol> getRoles() { return Collections.unmodifiableSet(roles); }
     public Set<Permiso> getPermisosExtra() { return Collections.unmodifiableSet(permisosExtra); }
 
-    // Estos metodos modelan los datos. El futuro servicio de administracion
-    // debe verificar quien esta autorizado a realizar las asignaciones.
+    // Estos metodos modelan datos. RolService verifica la autorizacion,
+    // jerarquia y permisos antes de guardar asignaciones en Oracle.
     public void agregarRol(Rol rol) { roles.add(Objects.requireNonNull(rol)); }
     public void quitarRol(Rol rol) { roles.remove(rol); }
     public void agregarPermisoExtra(Permiso permiso) {

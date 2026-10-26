@@ -40,7 +40,7 @@ public final class PruebasCaja {
     private final VentaService ventas = new VentaService();
     final List<Long> usuarios = new ArrayList<>();
     final List<Long> cajas = new ArrayList<>();
-    private final List<Long> productos = new ArrayList<>();
+    final List<Long> productos = new ArrayList<>();
     Usuario ana;
     Usuario luis;
     long arroz;
@@ -90,11 +90,11 @@ public final class PruebasCaja {
         igual(numero("SELECT COUNT(*) FROM venta WHERE turno_id = ?", turno.id()), "0");
         igual(numero("SELECT stock FROM producto WHERE id = ?", arroz), "30");
     }
-    private static boolean intento(Runnable operacion) {
+    static boolean intento(Runnable operacion) {
         try { operacion.run(); return true; }
         catch (ReglaNegocioException e) { return false; }
     }
-    private static List<Boolean> simultaneo(Callable<Boolean> primera, Callable<Boolean> segunda) throws Exception {
+    static List<Boolean> simultaneo(Callable<Boolean> primera, Callable<Boolean> segunda) throws Exception {
         ExecutorService hilos = Executors.newFixedThreadPool(2);
         CountDownLatch salida = new CountDownLatch(1);
         try {
@@ -300,6 +300,7 @@ public final class PruebasCaja {
             String turnosPropios = "SELECT id FROM turno WHERE cajero_id = ?";
             String ventasPropias = "SELECT id FROM venta WHERE turno_id IN (" + turnosPropios + ")";
             for (String sql : List.of(
+                    "DELETE FROM reversion WHERE detalle_id IN (SELECT id FROM venta_detalle WHERE venta_id IN (" + ventasPropias + "))",
                     "DELETE FROM pago WHERE venta_id IN (" + ventasPropias + ")",
                     "DELETE FROM venta_detalle WHERE venta_id IN (" + ventasPropias + ")",
                     "DELETE FROM venta WHERE turno_id IN (" + turnosPropios + ")",

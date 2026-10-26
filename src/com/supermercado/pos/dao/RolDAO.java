@@ -11,6 +11,35 @@ import java.util.List;
 import java.util.Optional;
 
 public final class RolDAO {
+    public Optional<Rol> bloquear(Connection con, long id) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement("SELECT id FROM rol WHERE id = ? FOR UPDATE")) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) { return Optional.empty(); }
+            }
+        }
+        return buscarPorId(con, id);
+    }
+    public long insertar(Connection con, String nombre, int nivel) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement("INSERT INTO rol (nombre,nivel) VALUES (?,?)", new String[] {"ID"})) {
+            ps.setString(1, nombre); ps.setInt(2, nivel); ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) { rs.next(); return rs.getLong(1); }
+        }
+    }
+    public void actualizar(Connection con, long id, String nombre, int nivel) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement("UPDATE rol SET nombre=?,nivel=? WHERE id=?")) {
+            ps.setString(1, nombre); ps.setInt(2, nivel); ps.setLong(3, id); ps.executeUpdate();
+        }
+    }
+    public void reemplazarPermisos(Connection con, long rol, java.util.Set<Long> permisos) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement("DELETE FROM rol_permiso WHERE rol_id=?")) {
+            ps.setLong(1, rol); ps.executeUpdate();
+        }
+        try (PreparedStatement ps = con.prepareStatement("INSERT INTO rol_permiso (rol_id,permiso_id) VALUES (?,?)")) {
+            for (long permiso : permisos) { ps.setLong(1, rol); ps.setLong(2, permiso); ps.addBatch(); }
+            ps.executeBatch();
+        }
+    }
     public List<Rol> listar(Connection con) throws SQLException {
         return consultar(con, "SELECT id, nombre, nivel FROM rol ORDER BY nivel, nombre", null);
     }

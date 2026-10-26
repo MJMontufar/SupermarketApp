@@ -32,7 +32,13 @@ public final class ProductoDAO {
             return ps.executeUpdate() == 1;
         }
     }
-    private Producto mapear(ResultSet rs) throws SQLException {
+    public boolean reingresar(Connection con, long id, int cantidad) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement(
+                "UPDATE producto SET stock = stock + ? WHERE id = ? AND stock <= 99999999 - ?")) {
+            ps.setInt(1, cantidad); ps.setLong(2, id); ps.setInt(3, cantidad); return ps.executeUpdate() == 1;
+        }
+    }
+    Producto mapear(ResultSet rs) throws SQLException {
         Producto p = new Producto(rs.getLong("id"), rs.getString("codigo_barras"), rs.getString("nombre"),
                 rs.getBigDecimal("precio"), rs.getInt("stock"));
         p.setActivo(rs.getInt("activo") == 1); p.setPorcentajeImpuesto(rs.getBigDecimal("porcentaje_impuesto"));

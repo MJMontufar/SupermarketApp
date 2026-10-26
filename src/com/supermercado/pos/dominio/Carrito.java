@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Carrito en memoria. El stock definitivo se validara en la transaccion JDBC. */
+/** Carrito en memoria. El stock definitivo se valida en la transaccion JDBC. */
 public final class Carrito {
     private final Map<Long, LineaCarrito> lineas = new LinkedHashMap<>();
 

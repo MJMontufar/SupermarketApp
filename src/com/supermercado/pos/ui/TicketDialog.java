@@ -4,6 +4,8 @@ import com.supermercado.pos.dominio.CierreTurno;
 import com.supermercado.pos.dominio.Pago;
 import com.supermercado.pos.dominio.ResumenTurno;
 import com.supermercado.pos.dominio.Venta;
+import com.supermercado.pos.dominio.Retiro;
+import com.supermercado.pos.dominio.Reversion;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -68,5 +70,20 @@ public final class TicketDialog extends JDialog {
                 + "\nDiferencia:            Q " + c.diferencia() + "\n(+ sobrante / - faltante)\n\nFecha: "
                 + c.fecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))
                 + "\nEstado: CERRADO\n";
+    }
+    public static String retiro(Retiro r) {
+        return "        RECIBO DE RETIRO A BOVEDA\n\nFolio: " + r.referencia() + "\nTurno: " + r.turnoId()
+                + "\nCajero: " + r.cajero() + "\nRecibido y autorizado por: " + r.receptor()
+                + "\nEntregado a boveda: Q " + r.monto() + "\nEfectivo anterior:  Q " + r.anterior()
+                + "\nEfectivo restante:  Q " + r.posterior() + "\nFecha: "
+                + r.fecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) + "\n";
+    }
+    public static String reversion(Reversion r) {
+        return "        COMPROBANTE DE REVERSION\n\nFolio: REV-" + r.id() + "\nVenta: " + r.ventaId()
+                + "\nTurno: " + r.turnoId() + "\nProducto: " + r.producto() + "\nCantidad: " + r.cantidad()
+                + "\nDevuelto en efectivo: Q " + r.monto() + "\nMotivo: " + r.motivo()
+                + "\nSolicitado por: " + r.cajero() + "\nAutorizado por: " + r.supervisor()
+                + "\nEstado de venta: " + r.estadoVenta() + "\nEfectivo restante: Q " + r.efectivoPosterior()
+                + "\nFecha: " + r.fecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) + "\n";
     }
 }

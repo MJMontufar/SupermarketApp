@@ -31,7 +31,8 @@ public final class UsuarioService {
     public List<Rol> rolesAsignables(Usuario actor) {
         requerir(actor, "ROL_ADMIN");
         try (Connection con = Conexion.obtener()) {
-            return rolDao.listar(con).stream().filter(rol -> rol.getNivel() < actor.nivelMaximo()).toList();
+            return rolDao.listar(con).stream().filter(rol -> rol.getNivel() < actor.nivelMaximo()
+                    && rol.getPermisos().stream().allMatch(p -> actor.tienePermiso(p.getCodigo()))).toList();
         } catch (SQLException e) { throw new IllegalStateException("No se pudieron consultar los roles", e); }
     }
 
@@ -47,10 +48,13 @@ public final class UsuarioService {
         try (Connection con = Conexion.obtener()) {
             con.setAutoCommit(false);
             try {
-                Rol rol = rolDao.buscarPorId(con, rolId)
+                Rol rol = rolDao.bloquear(con, rolId)
                         .orElseThrow(() -> new ReglaNegocioException("El rol no existe"));
                 if (rol.getNivel() >= actor.nivelMaximo()) {
                     throw new AutorizacionException("Solo puedes asignar roles de nivel inferior al tuyo");
+                }
+                if (rol.getPermisos().stream().anyMatch(p -> !actor.tienePermiso(p.getCodigo()))) {
+                    throw new AutorizacionException("Ese rol contiene permisos que no puedes conceder");
                 }
                 long id = usuarioDao.insertar(con, username, nombre, Seguridad.hash(clave));
                 usuarioDao.asignarRolInicial(con, id, rolId);
