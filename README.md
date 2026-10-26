@@ -1,195 +1,164 @@
 # SupermarketApp
 
-Proyecto de Programación II: sistema POS de supermercado con Java 21, Swing,
-JDBC puro y Oracle Database XE 21c. Sin Maven, Gradle ni frameworks.
+Proyecto de Programación II: POS de supermercado con **Java 21, Swing, JDBC puro
+y Oracle Database XE 21c**. Sin Maven, Gradle, frameworks, JUnit ni Mockito.
+La única biblioteca externa de la aplicación es `lib/ojdbc11.jar`.
 
-## Estado del proyecto
+## Qué está implementado
 
-Implementado y comprobable sin Oracle:
+- Login PBKDF2-HMAC-SHA256 con sal aleatoria y menú según permisos.
+- Apertura y recuperación de turno, caja/cajero únicos y fondo positivo.
+  Q0 solo se permite con autorización de otro usuario de mayor nivel.
+- Carrito editable, lector de código de barras como teclado, cobro F12 en
+  efectivo/tarjeta/mixto y desglose del impuesto incluido sin sumarlo otra vez.
+- Venta, detalles, pagos y descuento de stock en una transacción. El cambio
+  sale solo del efectivo; un fallo revierte la operación completa.
+- Corte intermedio con mínimo configurable y confirmación de supervisor.
+- Reversión parcial/total con precio histórico, motivo, autorización de mayor
+  nivel con REVERSION_AUTORIZAR, reposición de stock, estado y reembolso efectivo.
+- Tres fallos por solicitud de autorización, un solo uso, auditoría y sesión
+  del cajero conservada. Las claves de supervisor se limpian tras cada intento.
+- Cierre con resumen, contado, esperado y diferencia; el turno cerrado bloquea
+  nuevas ventas, retiros y reversiones.
+- Usuarios, altas/edición/desactivación, roles con matriz por módulo, varios
+  roles y extras por usuario, permisos heredados en gris y aplicación al siguiente login.
+- Catálogos de productos y cajas, búsqueda, edición y desactivación conservando
+  historial. Se evita sobrescribir stock cambiado por una venta y desactivar
+  o renumerar una caja con turno abierto.
+- Comprobantes y reportes de práctica con vista previa e impresión del JDK.
 
-- Productos y carrito en memoria: cantidades, existencias y total.
-- Dinero con `BigDecimal`, escala 2 y `RoundingMode.HALF_UP`.
-- Usuarios, roles, permisos heredados y permisos extra.
-- Hash PBKDF2-HMAC-SHA256 con sal aleatoria y verificación de contraseñas.
-- Ejecutor de pruebas propio, sin JUnit.
+Todas las operaciones con dinero usan `BigDecimal`, escala 2 y `HALF_UP`.
+La autorización se comprueba en servicios además de la interfaz. No se permiten
+roles propios, niveles iguales/superiores ni conceder permisos que el actor no
+posee. Los permisos extra no elevan el nivel jerárquico.
 
-La segunda etapa agrega el esquema Oracle de 15 tablas, los índices de turno
-único por caja y cajero, datos iniciales, conexión JDBC y pruebas de integridad.
-La cuenta de entrenamiento `admin / Admin123!` se crea al cargar los datos,
-con contraseña PBKDF2.
+## Empezar en Windows
 
-La tercera etapa agrega login Swing, menú según permisos, DAO de usuarios y
-roles, y administración básica: alta con rol inicial, búsqueda, edición de
-nombre/contraseña y desactivación. El servicio aplica permisos y jerarquía,
-además de los controles de la interfaz.
+1. Instala JDK 21, Oracle XE 21c y VS Code con **Extension Pack for Java**
+   (Microsoft / Java de Red Hat). Abre la raíz del proyecto, no solo `src`.
+2. Sigue [la preparación de Oracle](docs/base-de-datos.md) para crear POS y
+   POS_TEST, sus tablas y datos iniciales. No ejecutes el esquema sobre una
+   cuenta que ya tiene tablas.
+3. Desde la raíz, descarga una vez el driver oficial con checksum:
 
-La cuarta entrega agrega apertura y recuperación de turno, carrito Swing,
-cobro en efectivo/tarjeta/mixto, comprobante y cierre con conteo y diferencia.
-La venta y el descuento de stock son una transacción; cobrar y cerrar comparten
-un bloqueo de turno. No se necesitan cambios SQL en bases ya preparadas.
+   ```powershell
+   powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\descargar-driver.ps1
+   ```
 
-La apertura con fondo cero ahora requiere credenciales de otro usuario de nivel
-supervisor o superior, tres intentos por solicitud y auditoría. Consulta
-[la actualización de base y la práctica con Ana/Marta](docs/apertura-cero.md).
-Para una base existente ejecuta `scripts/actualizar-bd.ps1` antes de iniciar.
+4. Si vienes de una versión anterior a la apertura cero autorizada, aplica una
+   vez [la actualización de base](docs/apertura-cero.md):
 
-Siguen pendientes retiros a bóveda, reversiones autorizadas, catálogos editables,
-la matriz de roles/permisos y la asignación múltiple de roles y permisos extra.
-Las pruebas sin Oracle funcionan por separado.
+   ```powershell
+   powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\actualizar-bd.ps1
+   ```
 
-Para preparar la base, sigue [la guía de Oracle y JDBC](docs/base-de-datos.md).
-El [diagrama entidad-relación](docs/modelo-er.md) corresponde al esquema actual.
+   Conserva usuarios, turnos, ventas y stock. No repitas SQL 00/01 para actualizar.
+   Una instalación nueva con el esquema actual ya incluye esas restricciones.
+5. Arranca:
 
-## Abrir la aplicación de escritorio
+   ```powershell
+   powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\iniciar.ps1
+   ```
 
-Con POS ya preparado y `lib/ojdbc11.jar` presente, abre una terminal integrada
-desde la carpeta `scripts` y ejecuta:
+   La consola pide la contraseña técnica de Oracle de **pos**. El login Swing
+   pide una cuenta de la aplicación: son credenciales distintas. `JAVA_HOME`,
+   si existe, debe apuntar a un JDK 21. No se usan rutas fijas de tu computadora.
+
+## Usuarios de práctica
+
+| Usuario | Rol | Contraseña |
+|---|---|---|
+| admin | ADMIN, nivel 4 | `Admin123!`, cuenta pública de entrenamiento del PDF |
+| ana | CAJERO, nivel 1 | La que definiste al crearla desde admin |
+| luis | CAJERO, nivel 1 | La que definiste al crearla desde admin |
+| marta | SUPERVISOR, nivel 2 | La que definiste al crearla desde admin |
+
+Los datos iniciales crean admin. [La guía de usuarios](docs/login-y-usuarios.md)
+explica cómo crear las otras tres cuentas. Admin puede restablecer sus contraseñas
+sin borrar usuarios ni historial. No guardes contraseñas técnicas de Oracle en Git.
+
+## Actualizar y preparar la entrega
+
+La [lista de trabajo de entrega](docs/entrega.md) reúne los pasos de Git,
+práctica completa de caja, administración, pruebas y capturas. Las guías detalladas:
+
+- [Escenario integral, retiro, reversión y cierre](docs/ciclo-completo.md).
+- [Roles, permisos y catálogos](docs/administracion.md).
+- [Apertura Q0 autorizada](docs/apertura-cero.md).
+- [Modelo ER final](docs/modelo-er.md).
+- [Mapa de las 12 pantallas y evidencias](docs/evidencias/README.md).
+
+El escenario completo fue comprobado: fondo Q1000 + efectivo neto Q220 − retiro
+Q500 − reembolso Q30 = **Q690 esperados**. Con Q680 contados, diferencia **−Q10**.
+
+## Pruebas en Windows
+
+Con POS_TEST preparado, su actualización 04 aplicada y driver disponible:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\iniciar.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verificar-entrega.ps1
 ```
 
-Primero ingresa la clave de Oracle de **pos** en la consola. Después se abre la
-ventana de login: usa **admin / Admin123!** para la cuenta de entrenamiento.
-Son credenciales distintas. La excepción de apertura con Q0 requiere aplicar
-la actualización 04 una vez; `scripts/actualizar-bd.ps1` lo hace mediante JDBC
-conservando los datos. No repitas los SQL 00 y 01.
+Ejecuta 37 pruebas de dominio, 35 de negocio y 28 de administración: 100 casos.
+Las dos últimas suites piden la clave técnica de **pos_test**. Todas crean y
+limpian solo sus propias filas temporales; no reinician datos de entrenamiento.
+Las secuencias de identidad pueden avanzar aun después de rollback.
 
-Consulta [la guía de login y usuarios](docs/login-y-usuarios.md) para actualizar
-tu copia y crear a Ana, Luis y Marta. Después sigue la
-[práctica de turnos, ventas y cierre](docs/turnos-y-ventas.md), que incluye cómo
-actualizar con Git y los resultados esperados. Conserva tu driver al actualizar.
+También existen scripts separados: `pruebas.ps1`, `pruebas-oracle.ps1`,
+`pruebas-login.ps1`, `pruebas-caja.ps1`, `pruebas-apertura-cero.ps1`,
+`pruebas-negocio.ps1` y `pruebas-administracion.ps1`.
 
-## Abrir en VS Code
+La regresión completa pasó **204 casos** con Java 21, Oracle XE 21.3 y ojdbc11
+21.11: 37 dominio, 9 integridad Oracle, 19 login/usuarios, 29 apertura/cobro/cierre,
+24 apertura cero, 35 negocio integral, 28 administración y 23 gráficos con Swing
+real en Linux/Xvfb. Incluye los nueve casos obligatorios de la fase 10, concurrencia
+con conexiones reales y la fase 11. Compilación sin advertencias con `-Xlint:all -Werror`.
 
-1. Instala JDK 21 y la extensión **Extension Pack for Java**, de Microsoft.
-2. Abre la carpeta completa `SupermarketApp` con **Archivo → Abrir carpeta**.
-3. Usa **Terminal → Nueva terminal**, con PowerShell.
-4. Comprueba `java -version` y `javac -version`: ambos deben indicar 21.
+El estudiante ya confirmó en Windows JDK/JDBC, login y administración básica.
+Las nuevas ventanas deben comprobarse allí con la guía y capturas de su práctica.
+Las evidencias del repositorio son de pruebas automatizadas en POS_TEST/Linux;
+la impresión física no fue comprobada.
 
-La carpeta `.vscode` configura un proyecto Java sin herramientas de construcción.
-No se incluyen rutas específicas de ninguna computadora.
+## Compilar y probar sin Oracle
 
-## Compilar y ejecutar las pruebas en Windows
-
-Desde la raíz del proyecto:
+Windows:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\pruebas.ps1
 ```
 
-`ExecutionPolicy Bypass` se aplica únicamente a ese proceso. No modifica la
-política global de Windows. El script compila `src` y `test`, ejecuta las pruebas
-y devuelve un código distinto de cero si una prueba falla.
-
-Si `JAVA_HOME` está definido, los scripts usan su JDK; debe apuntar a Java 21.
-La carpeta `out` contiene clases generadas y está excluida de Git.
-
-Para compilar solamente el código de la aplicación:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\compilar.ps1
-```
-
-Alternativa sin ejecutar scripts PowerShell:
-
-```powershell
-$fuentes = @(Get-ChildItem src,test -Recurse -Filter *.java | ForEach-Object { $_.FullName })
-javac -encoding UTF-8 --release 21 -Xlint:all -d out @fuentes
-if ($LASTEXITCODE -eq 0) { java -cp out com.supermercado.pos.pruebas.Pruebas }
-```
-
-## Compilar y probar en Linux
-
-Con JDK 21 activo, desde la raíz del proyecto:
+Linux con JDK 21 activo:
 
 ```sh
 mkdir -p out
 find src test -name '*.java' > out/fuentes.txt
-javac -encoding UTF-8 --release 21 -Xlint:all -d out @out/fuentes.txt
+javac -encoding UTF-8 --release 21 -Xlint:all -Werror -d out @out/fuentes.txt
 java -cp out com.supermercado.pos.pruebas.Pruebas
 ```
 
-Ejecuta el último comando solo si la compilación termina correctamente.
+Ejecuta Java solo si compila correctamente. Para pruebas JDBC agrega
+`lib/ojdbc11.jar` al classpath, separado con `;` en Windows o `:` en Linux.
+Las suites de escrituras requieren configurar POS_TEST y comprueban la cuenta
+y contenedor reales antes de tocar filas. No utilizan un framework de pruebas.
 
 ## Estructura
 
 ```text
 src/com/supermercado/pos/
-  dominio/     Usuarios, roles, productos, carrito, turnos, pagos, ventas y cierre
-  dao/         Consultas y escrituras JDBC de usuarios, cajas, productos, turnos y ventas
-  servicio/    Autenticación, usuarios, apertura, cobro y cierre transaccional
-  ui/          Login, menú, usuarios, apertura, carrito, pagos, tickets y cierre
-  excepcion/   ReglaNegocioException, AutorizacionException
-  util/        Dinero, Seguridad, Conexion, Configuracion, Sesion
-test/com/supermercado/pos/pruebas/Pruebas.java
-scripts/       Compilación y pruebas para Windows
-docs/          Guías por etapa, modelo ER y evidencias
-sql/           Creación de cuentas, esquema, datos y verificación
-lib/           Driver JDBC descargado localmente, excluido de Git
-config.properties  URL de Oracle, usuario POS y mínimo operativo; sin claves
+  dominio/     Usuarios, roles, carrito, caja/turno, ventas, pagos, retiros y reversiones
+  dao/         PreparedStatement, consultas y escrituras JDBC
+  servicio/    Reglas, jerarquía y transacciones
+  ui/          Las ventanas Swing y trabajo de BD fuera del hilo de eventos
+  excepcion/   ReglaNegocioException y AutorizacionException
+  util/        Dinero, PBKDF2, conexión, configuración y sesión
+sql/           Cuentas, 15 tablas, semillas, verificación y migración 04
+test/          Ejecutores propios de pruebas y pruebas de ventanas reales
+scripts/       Compilación, driver, ejecución, migración y verificación para Windows
+docs/          Guías, ER, lista de entrega y evidencias
+lib/           Driver descargado localmente, excluido de Git
+config.properties  URL, cuenta técnica y mínimo operativo; sin contraseña
 ```
 
-## Validación de esta etapa
-
-Las 37 pruebas sin base de datos pasaron con JDK 21 en Linux, sin advertencias del
-compilador. Los scripts se ejercitaron con PowerShell 7 en Linux, incluyendo
-rutas con espacios y un fallo de compilación simulado. La ejecución en Windows
-de la primera etapa también fue confirmada durante el desarrollo.
-
-La segunda etapa tiene una suite separada para Oracle XE 21c: revisa la guía de
-base de datos para ejecutarla exclusivamente en `POS_TEST`. La suite conserva
-las tablas y revierte sus registros de prueba con `rollback`. Las secuencias de
-identidad pueden avanzar incluso al deshacer una transacción.
-
-Las 9 pruebas Oracle pasaron con Oracle XE 21.3, Java 21 y `ojdbc11` 21.11.
-Se ejecutaron los scripts SQL en POS y POS_TEST, la conexión JDBC y la repetición
-de datos iniciales conservando precio y stock existentes. El descargador se
-probó con PowerShell 7 en Linux, incluyendo descarga, checksum, reutilización
-y conservación de un driver distinto. La conexión JDBC y lectura de cinco
-productos también se confirmaron en Windows durante el desarrollo.
-
-La tercera etapa pasó 19 pruebas funcionales de autenticación y administración
-en POS_TEST. Se comprobó el ingreso oculto de la clave técnica por consola,
-sin variable de entorno. Cuatro pruebas adicionales abrieron ventanas Swing
-reales en Linux con Xvfb, autenticaron, crearon un cajero desde el formulario y
-verificaron los permisos del menú. Hay capturas en
-[evidencias de interfaz](docs/evidencias/etapa3/README.md).
-
-La cuarta entrega pasó 29 pruebas de servicios reales de caja en POS_TEST,
-incluidas aperturas simultáneas, dos cajas vendiendo la última unidad y un cobro
-simultáneo con el cierre. Otras siete pruebas recorrieron ventanas Swing reales
-con Xvfb: apertura, edición del carrito, los tres medios de pago, comprobante,
-recuperación de turno y cierre con faltante de Q20. Ver
-[evidencias de la cuarta entrega](docs/evidencias/etapa4/README.md).
-El login y la administración de usuarios también fueron confirmados en Windows;
-la nueva interfaz de caja necesita la práctica local descrita en su guía.
-
-La apertura cero añade 24 pruebas de servicios y restricciones y tres gráficas:
-autorización, jerarquía, cancelación, límite de tres fallos, auditoría y limpieza
-de claves. La migración pasó por JDBC y SQL*Plus en POS/POS_TEST y se repitió
-con datos existentes conservados. El total es 132 pruebas correctas; la nueva
-excepción necesita aún la comprobación manual en Windows.
-
-## Límites de estas pruebas
-
-Los casos de servicios cubren cinco comportamientos obligatorios de la fase 10:
-caja ocupada, fondo cero, pago insuficiente, mixto y cierre con diferencia −20.
-Faltan retiro bajo mínimo, rechazo de autorizador cajero, autoautorización y
-reversión excesiva. El escenario completo de Ana con Q690 esperados todavía no
-está implementado: esta entrega llega a Q1,220 antes de retiro y reversión.
-
-El carrito valida existencias en memoria y el servicio vuelve a validarlas en
-Oracle durante la transacción de cobro. Un fallo revierte venta, detalles,
-pagos y stock. Un comprobante es de práctica; no se procesan tarjetas bancarias
-ni se emite factura fiscal. La impresión física no fue probada en cloud.
-
-Los permisos se comprueban tanto en interfaz como en servicios. La autorización
-y auditoría de apertura cero están implementadas; aplicarlas a retiros y
-reversiones sigue pendiente. Los precios ya incluyen
-impuesto; el ticket muestra su desglose sin sumarlo nuevamente al total.
-
-Nunca guardes contraseñas reales en el código o en Git. Los hashes de `test`
-son únicamente datos de pruebas, sin cuentas asociadas.
-
-Consulta [la explicación inicial](docs/primera-etapa.md) antes de continuar.
+El conteo por denominaciones y otros retos opcionales no se implementaron.
+La excepción opcional de apertura cero sí está disponible. Los comprobantes son
+para la práctica del curso: no procesan tarjetas bancarias ni facturación fiscal.

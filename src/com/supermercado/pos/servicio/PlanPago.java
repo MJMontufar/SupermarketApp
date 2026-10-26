@@ -11,7 +11,7 @@ import java.util.List;
 public final class PlanPago {
     private PlanPago() { }
     public static List<Pago> calcular(BigDecimal total, BigDecimal recibido, BigDecimal tarjeta) {
-        total = Reglas.monto(total, "Total", true);
+        total = Reglas.monto(total, "Total", false);
         recibido = Reglas.monto(recibido, "Efectivo recibido", false);
         tarjeta = Reglas.monto(tarjeta, "Tarjeta", false);
         if (tarjeta.compareTo(total) > 0) {
@@ -20,7 +20,7 @@ public final class PlanPago {
         BigDecimal aplicado = total.subtract(tarjeta);
         if (recibido.compareTo(aplicado) < 0) { throw new ReglaNegocioException("Pago insuficiente"); }
         if (aplicado.signum() == 0 && recibido.signum() > 0) {
-            throw new ReglaNegocioException("El pago ya esta cubierto con tarjeta; retira el efectivo ingresado");
+            throw new ReglaNegocioException("El total ya esta cubierto; retira el efectivo ingresado");
         }
         List<Pago> pagos = new ArrayList<>();
         if (aplicado.signum() > 0) {

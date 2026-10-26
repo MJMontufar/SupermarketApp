@@ -38,7 +38,7 @@ public final class ProductoDAO {
             ps.setInt(1, cantidad); ps.setLong(2, id); ps.setInt(3, cantidad); return ps.executeUpdate() == 1;
         }
     }
-    private Producto mapear(ResultSet rs) throws SQLException {
+    Producto mapear(ResultSet rs) throws SQLException {
         Producto p = new Producto(rs.getLong("id"), rs.getString("codigo_barras"), rs.getString("nombre"),
                 rs.getBigDecimal("precio"), rs.getInt("stock"));
         p.setActivo(rs.getInt("activo") == 1); p.setPorcentajeImpuesto(rs.getBigDecimal("porcentaje_impuesto"));

@@ -40,7 +40,7 @@ public final class PruebasCaja {
     private final VentaService ventas = new VentaService();
     final List<Long> usuarios = new ArrayList<>();
     final List<Long> cajas = new ArrayList<>();
-    private final List<Long> productos = new ArrayList<>();
+    final List<Long> productos = new ArrayList<>();
     Usuario ana;
     Usuario luis;
     long arroz;

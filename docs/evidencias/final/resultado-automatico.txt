@@ -1,0 +1,11 @@
+ESCENARIO FASE 11 - EJECUCION AUTOMATIZADA POS_TEST
+Datos propios temporales; no es la base de Windows.
+Fondo: 1000.00
+Efectivo aplicado: 220.00
+Tarjeta: 130.00
+Retiro: 500.00
+Reembolso: 30.00
+Esperado: 690.00
+Contado: 680.00
+Diferencia: -10.00
+Estado: CERRADO

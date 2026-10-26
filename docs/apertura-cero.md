@@ -106,8 +106,8 @@ reutilizarse ni aplicarse a otra caja.
 - Oracle impide fondos negativos, Q0 sin autorizador, autorizador inexistente
   y autoautorización. La comprobación de credenciales y roles está en el servicio.
 
-La autorización puntual también se utilizará al desarrollar retiros y
-reversiones. Esas operaciones siguen pendientes; esta entrega no las habilita.
+La autorización puntual también se utiliza en [retiros y reversiones](ciclo-completo.md).
+Cada operación exige su permiso correspondiente y conserva la sesión del cajero.
 
 ## Pruebas en POS_TEST
 

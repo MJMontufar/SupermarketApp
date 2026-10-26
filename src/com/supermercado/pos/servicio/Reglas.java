@@ -8,6 +8,14 @@ import java.math.BigDecimal;
 
 final class Reglas {
     private Reglas() { }
+    static String texto(String valor, String campo, int maximoBytes) {
+        if (valor == null || valor.isBlank()) { throw new ReglaNegocioException(campo + " es obligatorio"); }
+        String limpio = valor.strip();
+        if (limpio.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > maximoBytes) {
+            throw new ReglaNegocioException(campo + " es demasiado largo");
+        }
+        return limpio;
+    }
     static void requerir(Usuario actor, String permiso) {
         if (actor == null || actor.getId() == null || !actor.isActivo() || !actor.tienePermiso(permiso)) {
             throw new AutorizacionException("No tienes permiso para esta operacion");
