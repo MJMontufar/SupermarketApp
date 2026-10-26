@@ -53,17 +53,17 @@ public final class PruebasInterfazCaja {
         SwingUtilities.invokeAndWait(() -> campo(pago, "pago.confirmar", JButton.class).doClick());
         return esperarVentana(TicketDialog.class);
     }
-    private static void cerrarTicket(TicketDialog ticket) throws Exception {
+    static void cerrarTicket(TicketDialog ticket) throws Exception {
         SwingUtilities.invokeAndWait(() -> campo(ticket, "ticket.cerrar", JButton.class).doClick());
     }
-    private static JButton boton(Component raiz, String texto) {
+    static JButton boton(Component raiz, String texto) {
         if (raiz instanceof JButton b && texto.equals(b.getText())) { return b; }
         if (raiz instanceof Container c) {
             for (Component hijo : c.getComponents()) { JButton b = boton(hijo, texto); if (b != null) { return b; } }
         }
         return null;
     }
-    private static JDialog confirmacion() {
+    static JDialog confirmacion() {
         for (Window w : Window.getWindows()) {
             if (w.isShowing() && w instanceof JDialog d && "Cerrar turno".equals(d.getTitle())) { return d; }
         }

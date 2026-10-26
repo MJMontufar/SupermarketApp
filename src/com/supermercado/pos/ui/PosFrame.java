@@ -54,6 +54,8 @@ public final class PosFrame extends JFrame {
     private final JButton quitar = new JButton("Quitar seleccionado");
     private final JButton cancelar = new JButton("Cancelar venta");
     private final JButton cerrar = new JButton("Cerrar turno");
+    private final JButton retiro = new JButton("Corte intermedio");
+    private final JButton reversion = new JButton("Reversion");
     private final JLabel totales = new JLabel("Total: Q 0.00");
     private final JLabel estado = new JLabel("Consultando catalogo...");
     private boolean ocupado;
@@ -85,6 +87,7 @@ public final class PosFrame extends JFrame {
         codigo.setName("pos.codigo"); cantidad.setName("pos.cantidad"); productos.setName("pos.producto");
         agregar.setName("pos.agregar"); cobrar.setName("pos.cobrar"); tabla.setName("pos.carrito");
         cerrar.setName("pos.cerrar"); estado.setName("pos.estado"); totales.setName("pos.totales");
+        retiro.setName("pos.retiro"); reversion.setName("pos.reversion");
         tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         productos.setRenderer(new DefaultListCellRenderer() {
             private static final long serialVersionUID = 1L;
@@ -102,7 +105,7 @@ public final class PosFrame extends JFrame {
         JPanel seleccion = new JPanel(new FlowLayout(FlowLayout.LEFT)); seleccion.add(productos); seleccion.add(agregar); seleccion.add(actualizar);
         norte.add(seleccion); norte.add(estado);
         JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        botones.add(quitar); botones.add(cancelar); botones.add(cobrar); botones.add(cerrar);
+        botones.add(quitar); botones.add(cancelar); botones.add(cobrar); botones.add(retiro); botones.add(reversion); botones.add(cerrar);
         JPanel sur = new JPanel(new BorderLayout(8, 8)); sur.add(totales, BorderLayout.NORTH); sur.add(botones, BorderLayout.SOUTH);
         JPanel contenido = new JPanel(new BorderLayout(12, 12)); contenido.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
         contenido.add(norte, BorderLayout.NORTH); contenido.add(new JScrollPane(tabla), BorderLayout.CENTER); contenido.add(sur, BorderLayout.SOUTH);
@@ -117,6 +120,14 @@ public final class PosFrame extends JFrame {
         });
         cancelar.addActionListener(e -> { if (confirmarDescartar()) { carrito.vaciar(); refrescar(); codigo.requestFocusInWindow(); } });
         cobrar.addActionListener(e -> cobrar()); cerrar.addActionListener(e -> cerrarTurno());
+        retiro.addActionListener(e -> {
+            if (!terminarEdicion()) { return; }
+            new CorteIntermedioDialog(this, turno, actor).setVisible(true); cargar();
+        });
+        reversion.addActionListener(e -> {
+            if (!terminarEdicion()) { return; }
+            new ReversionFrame(this, turno, actor).setVisible(true); cargar();
+        });
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F12"), "cobrar");
         getRootPane().getActionMap().put("cobrar", new AbstractAction() {
             private static final long serialVersionUID = 1L;
@@ -135,6 +146,8 @@ public final class PosFrame extends JFrame {
         cobrar.setEnabled(!valor && !carrito.estaVacio() && actor.tienePermiso("VENTA_COBRAR"));
         quitar.setEnabled(!valor && !carrito.estaVacio()); cancelar.setEnabled(!valor && !carrito.estaVacio());
         cerrar.setEnabled(!valor && actor.tienePermiso("TURNO_CERRAR"));
+        retiro.setEnabled(!valor && actor.tienePermiso("CORTE_INTERMEDIO"));
+        reversion.setEnabled(!valor && actor.tienePermiso("REVERSION_SOLICITAR"));
     }
     private void cargar() {
         if (ocupado) { return; }

@@ -14,18 +14,22 @@ import java.util.Arrays;
 public final class AutorizacionService {
     @FunctionalInterface interface Operacion<T> { T ejecutar(Connection con, Usuario supervisor) throws SQLException; }
 
-    Solicitud solicitar(Usuario actor, String contexto) { return new Solicitud(actor, contexto); }
+    Solicitud solicitar(Usuario actor, String contexto) { return solicitar(actor, contexto, "TURNO_ABRIR"); }
+    Solicitud solicitar(Usuario actor, String contexto, String permiso) { return new Solicitud(actor, contexto, permiso); }
 
     /** Una solicitud ligada a una operacion, con tres fallos maximos y un solo uso exitoso. */
     static final class Solicitud {
         private final Usuario actor;
         private final String contexto;
+        private final String permiso;
         private int fallidos;
         private boolean consumida;
         private final UsuarioDAO usuarios = new UsuarioDAO();
         private final AuditoriaDAO auditoria = new AuditoriaDAO();
 
-        private Solicitud(Usuario actor, String contexto) { this.actor = actor; this.contexto = contexto; }
+        private Solicitud(Usuario actor, String contexto, String permiso) {
+            this.actor = actor; this.contexto = contexto; this.permiso = permiso;
+        }
         synchronized int restantes() { return Math.max(0, 3 - fallidos); }
         synchronized boolean terminada() { return consumida || fallidos >= 3; }
 
@@ -59,14 +63,17 @@ public final class AutorizacionService {
             }
             Usuario encontrado = usuarios.buscarPorUsername(con, username.trim())
                     .orElseThrow(() -> new AutorizacionException("Usuario o contrasena invalidos"));
-            // Impide desactivar o cambiar el perfil durante esta autorizacion y apertura.
+            // Impide desactivar o cambiar el perfil durante la autorizacion y operacion.
             Usuario supervisor = usuarios.buscarPorId(con, encontrado.getId(), true).orElseThrow();
             if (!supervisor.isActivo() || !Seguridad.verificar(clave, supervisor.getPasswordHash())) {
                 throw new AutorizacionException("Usuario o contrasena invalidos");
             }
             if (supervisor.getId().equals(actor.getId()) || supervisor.nivelMaximo() < 2
-                    || supervisor.nivelMaximo() <= actor.nivelMaximo() || !supervisor.tienePermiso("TURNO_ABRIR")) {
+                    || supervisor.nivelMaximo() <= actor.nivelMaximo()) {
                 throw new AutorizacionException("Debe autorizar otro usuario con nivel supervisor o superior y mayor nivel que el cajero");
+            }
+            if (!supervisor.tienePermiso(permiso)) {
+                throw new AutorizacionException("El usuario no tiene permiso para autorizar esta operacion");
             }
             return supervisor;
         }
