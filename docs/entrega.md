@@ -101,6 +101,9 @@ conserva la carpeta `datos/fotos` al respaldar o mover tu proyecto.
 
 Crea una carpeta de evidencias de tu práctica y captura:
 
+La [guía de capturas y respaldo](capturas-y-respaldo.md) indica cómo guardarlas
+en Windows, nombres sugeridos y cómo conservar código, fotos y datos Oracle.
+
 1. Login.
 2. Apertura de turno.
 3. Punto de venta con carrito.

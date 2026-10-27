@@ -90,6 +90,7 @@ práctica completa de caja, administración, pruebas y capturas. Las guías deta
 - [Modelo ER final](docs/modelo-er.md).
 - [Mapa de las 12 pantallas y evidencias](docs/evidencias/README.md).
 - [Nuevo diseño, fotografías y respaldo de imágenes](docs/diseno-y-fotos.md).
+- [Capturas en Windows y respaldo del proyecto y Oracle](docs/capturas-y-respaldo.md).
 
 El escenario completo fue comprobado: fondo Q1000 + efectivo neto Q220 − retiro
 Q500 − reembolso Q30 = **Q690 esperados**. Con Q680 contados, diferencia **−Q10**.
