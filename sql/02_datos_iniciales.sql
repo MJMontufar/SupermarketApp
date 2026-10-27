@@ -81,4 +81,3 @@ MERGE INTO usuario_rol d USING (
 WHEN NOT MATCHED THEN INSERT (usuario_id, rol_id) VALUES (s.usuario_id, s.rol_id);
 
 COMMIT;
-PROMPT Datos preparados: 9 permisos, 4 roles, 3 cajas, 5 productos y admin.

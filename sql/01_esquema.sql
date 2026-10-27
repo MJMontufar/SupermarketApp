@@ -169,5 +169,3 @@ CREATE TABLE auditoria_autorizacion (
     motivo VARCHAR2(200) NOT NULL,
     fecha TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL
 );
-
-PROMPT Esquema creado: 15 tablas y dos indices de turno abierto.

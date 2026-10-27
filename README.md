@@ -148,8 +148,14 @@ y contenedor reales antes de tocar filas. No utilizan un framework de pruebas.
 
 ## Estructura
 
+La estructura principal conserva el Paso 4 del documento (página 4). `pos/`
+representa la raíz del proyecto: en tu equipo es `SupermarketApp-Git`.
+Las carpetas adicionales separan documentación, pruebas y herramientas de apoyo.
+Consulta [qué exige el documento y cómo ejecutar sin archivos PS1](docs/estructura-y-ejecucion.md).
+
 ```text
 src/com/supermercado/pos/
+  Main.java    Punto de entrada de la aplicación
   dominio/     Usuarios, roles, carrito, caja/turno, ventas, pagos, retiros y reversiones
   dao/         PreparedStatement, consultas y escrituras JDBC
   servicio/    Reglas, jerarquía y transacciones

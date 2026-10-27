@@ -26,11 +26,8 @@ CREATE USER pos NO AUTHENTICATION
 CREATE USER pos_test NO AUTHENTICATION
     DEFAULT TABLESPACE users QUOTA UNLIMITED ON users;
 
-PROMPT Define la clave de la cuenta de base de datos POS.
 PASSWORD pos
-PROMPT Define otra clave para la cuenta de pruebas POS_TEST.
 PASSWORD pos_test
 
 GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE VIEW TO pos;
 GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE VIEW TO pos_test;
-PROMPT Usuarios preparados. Conectate ahora como POS a XEPDB1.
