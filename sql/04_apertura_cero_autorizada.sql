@@ -70,4 +70,3 @@ BEGIN
 END;
 -- FIN MIGRACION
 /
-PROMPT Actualizacion lista: fondo cero requiere autorizador distinto. Datos conservados.
