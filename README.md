@@ -36,6 +36,11 @@ posee. Los permisos extra no elevan el nivel jerárquico.
 
 ## Empezar en Windows
 
+Si empiezas desde cero o compartirás el proyecto, consulta la
+[guía completa en PDF](docs/Guia-SupermarketApp-Windows.pdf) o su
+[versión de texto](docs/guia-instalacion-windows.md). Incluye Git, acceso a GitHub,
+instalación, Oracle, compilación, presentación, actualizaciones y respaldos.
+
 1. Instala JDK 21, Oracle XE 21c y VS Code con **Extension Pack for Java**
    (Microsoft / Java de Red Hat). Abre la raíz del proyecto, no solo `src`.
 2. Sigue [la preparación de Oracle](docs/base-de-datos.md) para crear POS y
