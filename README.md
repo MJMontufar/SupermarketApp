@@ -118,18 +118,6 @@ También existen scripts separados: `pruebas.ps1`, `pruebas-oracle.ps1`,
 `pruebas-negocio.ps1`, `pruebas-administracion.ps1` y `pruebas-fotos.ps1`.
 Este último añade 12 casos de la función opcional, separados de las 100 pruebas rápidas.
 
-La regresión completa pasó **219 casos** con Java 21, Oracle XE 21.3 y ojdbc11
-21.11: 37 dominio, 9 integridad Oracle, 19 login/usuarios, 29 apertura/cobro/cierre,
-24 apertura cero, 35 negocio integral, 28 administración, 12 fotografías y 26 gráficos con Swing
-real en Linux/Xvfb. Incluye los nueve casos obligatorios de la fase 10, concurrencia
-con conexiones reales y la fase 11. Compilación sin advertencias con `-Xlint:all -Werror`.
-
-El estudiante confirmó en Windows las 100 pruebas rápidas de dominio, negocio
-y administración. El nuevo diseño y las fotografías deben comprobarse allí con
-la guía y capturas de su práctica.
-Las evidencias del repositorio son de pruebas automatizadas en POS_TEST/Linux;
-la impresión física no fue comprobada.
-
 ## Compilar y probar sin Oracle
 
 Windows:
@@ -137,20 +125,6 @@ Windows:
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\pruebas.ps1
 ```
-
-Linux con JDK 21 activo:
-
-```sh
-mkdir -p out
-find src test -name '*.java' > out/fuentes.txt
-javac -encoding UTF-8 --release 21 -Xlint:all -Werror -d out @out/fuentes.txt
-java -cp out com.supermercado.pos.pruebas.Pruebas
-```
-
-Ejecuta Java solo si compila correctamente. Para pruebas JDBC agrega
-`lib/ojdbc11.jar` al classpath, separado con `;` en Windows o `:` en Linux.
-Las suites de escrituras requieren configurar POS_TEST y comprueban la cuenta
-y contenedor reales antes de tocar filas. No utilizan un framework de pruebas.
 
 ## Estructura
 
