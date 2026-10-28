@@ -36,7 +36,7 @@ posee. Los permisos extra no elevan el nivel jerárquico.
 
 ## Empezar en Windows
 
-Si empiezas desde cero o compartirás el proyecto, consulta la
+Para iniciar desde cero o compartirás el proyecto, consulta la
 [guía completa en PDF](docs/Guia-SupermarketApp-Windows.pdf) o su
 [versión de texto](docs/guia-instalacion-windows.md). Incluye Git, acceso a GitHub,
 instalación, Oracle, compilación, presentación, actualizaciones y respaldos.
